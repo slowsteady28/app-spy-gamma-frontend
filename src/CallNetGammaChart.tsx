@@ -1,0 +1,67 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+} from "recharts";
+
+type CallNetGammaChartProps = {
+  lookback: number;
+};
+
+type NetGammaDataPoint = {
+  date: string;
+  gamma: number;
+};
+
+function CallNetGammaChart({ lookback }: CallNetGammaChartProps) {
+  const [data, setData] = useState<NetGammaDataPoint[]>([]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8000/data/cw1-net-gamma?lookback=${lookback}`)
+      .then((res) => {
+        console.log("Net Gamma Data:", res.data);
+        setData(res.data);
+      })
+      .catch((err) => console.error("Error loading Net Gamma data", err));
+  }, [lookback]);
+
+  const minGamma = Math.min(...data.map((d) => d.gamma ?? 0));
+  const maxGamma = Math.max(...data.map((d) => d.gamma ?? 0));
+
+  return (
+    <div className="my-4">
+      <h4>Net Call Gamma</h4>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data} syncId="spy-sync">
+          <XAxis dataKey="date" />
+          <YAxis
+            domain={[minGamma, maxGamma]}
+            label={{
+              value: "Net Gamma",
+              angle: -90,
+              position: "insideLeft",
+            }}
+          />
+          <Tooltip
+            cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
+          />
+          <Bar
+            dataKey="gamma"
+            name="Net Gamma"
+            fill="#0066cc"
+            barSize={14}
+            opacity={0.8}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+export default CallNetGammaChart;
