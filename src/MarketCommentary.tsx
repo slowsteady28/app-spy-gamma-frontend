@@ -15,7 +15,7 @@ export default function MarketCommentary() {
   const [currentTime, setCurrentTime] = useState("");
 
   useEffect(() => {
-    fetch("${apiBaseUrl}/api/market-commentary")
+    fetch('${apiBaseUrl}/api/market-commentary')
       .then((res) => res.json())
       .then((data) => setData(data))
       .catch((err) => console.error("Failed to fetch commentary:", err));

@@ -30,7 +30,7 @@ const OverView = () => {
 
   useEffect(() => {
     axios
-      .get("${apiBaseUrl}/api/overview")
+      .get('${apiBaseUrl}/api/overview')
       .then((res) => setData(res.data))
       .catch((err) => console.error("Failed to fetch data", err));
   }, []);
