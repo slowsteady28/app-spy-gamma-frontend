@@ -10,6 +10,7 @@ interface CommentaryEntry {
   images: { src: string; caption: string }[];
 }
 
+console.log("Here: API Base URL:", apiBaseUrl);
 export default function MarketCommentary() {
   const [data, setData] = useState<CommentaryEntry[]>([]);
   const [currentTime, setCurrentTime] = useState("");
