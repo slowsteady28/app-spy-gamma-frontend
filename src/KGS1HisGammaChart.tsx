@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+const apiBaseUrl = import.meta.env.VITE_API_URL;
 
 type KGS1DataPoint = {
   date: string;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+const apiBaseUrl = import.meta.env.VITE_API_URL;
 
 function CallWallMetrics() {
   const [data, setData] = useState<any>(null);

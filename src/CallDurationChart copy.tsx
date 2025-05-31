@@ -11,7 +11,7 @@ import {
 
 const apiBaseUrl = import.meta.env.VITE_API_URL;
 
-type PutDurationChartProps = {
+type CallDurationChartProps = {
   lookback: number;
 };
 
@@ -20,17 +20,20 @@ type DurationDataPoint = {
   duration: number;
 };
 
-function PutDurationChart({ lookback }: PutDurationChartProps) {
+console.log("Using API Base URL:", apiBaseUrl);
+console.log("1234");
+
+function CallDurationChart({ lookback }: CallDurationChartProps) {
   const [data, setData] = useState<DurationDataPoint[]>([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/pw1-duration?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/cw1-duration?lookback=${lookback}`)
       .then((res) => {
-        console.log("Put Duration Data:", res.data);
+        console.log("Duration Chart Data:", res.data);
         setData(res.data);
       })
-      .catch((err) => console.error("Error loading PW1 duration data", err));
+      .catch((err) => console.error("Error loading duration data", err));
   }, [lookback]);
 
   const min = Math.min(...data.map((d) => d.duration ?? 0));
@@ -38,7 +41,7 @@ function PutDurationChart({ lookback }: PutDurationChartProps) {
 
   return (
     <div className="my-4">
-      <h4>Average Put Gamma Duration</h4>
+      <h4>Average Call Gamma Duration</h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
@@ -59,4 +62,4 @@ function PutDurationChart({ lookback }: PutDurationChartProps) {
   );
 }
 
-export default PutDurationChart;
+export default CallDurationChart;

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw"; // enables raw HTML rendering
 
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+const apiBaseUrl = import.meta.env.VITE_API_URL;
 
 interface CommentaryEntry {
   date: string;

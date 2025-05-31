@@ -9,7 +9,7 @@ import {
   BarChart,
 } from "recharts";
 
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+const apiBaseUrl = import.meta.env.VITE_API_URL;
 
 type PutNetGammaChartProps = {
   lookback: number;
