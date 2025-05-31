@@ -21,7 +21,6 @@ type DurationDataPoint = {
 };
 
 console.log("Using API base URL:", apiBaseUrl);
-console.log("another note")
 
 function CallDurationChart({ lookback }: CallDurationChartProps) {
   const [data, setData] = useState<DurationDataPoint[]>([]);
