@@ -10,6 +10,8 @@ import {
 } from "recharts";
 import axios from "axios";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 interface OverviewDataPoint {
   "Date (EOD)": string;
   CW1: number;
@@ -28,7 +30,7 @@ const OverView = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/overview")
+      .get("${apiBaseUrl}/api/overview")
       .then((res) => setData(res.data))
       .catch((err) => console.error("Failed to fetch data", err));
   }, []);

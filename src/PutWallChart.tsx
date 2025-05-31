@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type PutWallChartProps = {
   lookback: number;
   selectedRange: [number, number] | null;
@@ -33,7 +35,7 @@ function PutWallChart({
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/pw1-history?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw1-history?lookback=${lookback}`)
       .then((res) => {
         console.log("Put Wall Chart Data:", res.data);
         setData(res.data);

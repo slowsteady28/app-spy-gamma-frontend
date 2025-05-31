@@ -9,6 +9,8 @@ import {
   BarChart,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type PutNetGammaChartProps = {
   lookback: number;
 };
@@ -23,7 +25,7 @@ function PutNetGammaChart({ lookback }: PutNetGammaChartProps) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/pw1-net-gamma?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw1-net-gamma?lookback=${lookback}`)
       .then((res) => {
         console.log("PW1 Net Gamma Data:", res.data);
         setData(res.data);

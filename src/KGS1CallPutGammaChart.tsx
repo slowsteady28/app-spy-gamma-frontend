@@ -10,6 +10,8 @@ import {
   Legend,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type GammaDataPoint = {
   date: string;
   call_gamma: number;
@@ -25,7 +27,7 @@ function KGS1CallPutGammaChart({ lookback }: Props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/kgs1-gamma?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/kgs1-gamma?lookback=${lookback}`)
       .then((res) => setData(res.data))
       .catch((err) => console.error("Error loading KGS1 gamma data", err));
   }, [lookback]);

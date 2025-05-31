@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type CallDurationChartProps = {
   lookback: number;
 };
@@ -23,7 +25,7 @@ function CallDurationChart({ lookback }: CallDurationChartProps) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/cw1-duration?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/cw1-duration?lookback=${lookback}`)
       .then((res) => {
         console.log("Duration Chart Data:", res.data);
         setData(res.data);

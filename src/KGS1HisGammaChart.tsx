@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type KGS1DataPoint = {
   date: string;
   kgs1: number;
@@ -23,7 +25,7 @@ function KGS1StrikeChart({ lookback }: Props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/kgs1-history?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/kgs1-history?lookback=${lookback}`)
       .then((res) => setData(res.data))
       .catch((err) => console.error("Error loading KGS1 data", err));
   }, [lookback]);

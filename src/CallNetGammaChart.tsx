@@ -9,6 +9,8 @@ import {
   BarChart,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type CallNetGammaChartProps = {
   lookback: number;
 };
@@ -23,7 +25,7 @@ function CallNetGammaChart({ lookback }: CallNetGammaChartProps) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/cw1-net-gamma?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/cw1-net-gamma?lookback=${lookback}`)
       .then((res) => {
         console.log("Net Gamma Data:", res.data);
         setData(res.data);

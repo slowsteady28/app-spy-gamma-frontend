@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 function CallWallMetrics() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/data/cw1-summary")
+      .get("${apiBaseUrl}/data/cw1-summary")
       .then((res) => setData(res.data))
       .catch((err) => console.error("Failed to load metrics:", err));
   }, []);

@@ -10,6 +10,8 @@ import {
   Legend,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type Props = {
   lookback: number;
 };
@@ -19,7 +21,7 @@ function KGS1DurationChart({ lookback }: Props) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/kgs1-duration?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/kgs1-duration?lookback=${lookback}`)
       .then((res) => setData(res.data))
       .catch((err) => console.error("Error loading KGS1 Duration", err));
   }, [lookback]);

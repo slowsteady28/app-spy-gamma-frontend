@@ -10,6 +10,8 @@ import {
 } from "recharts";
 import axios from "axios";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type NetOIChartProps = {
   lookback: number;
   selectedRange: [number, number] | null;
@@ -30,7 +32,7 @@ function CallNetOIChart({
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/cw1-net-oi?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/cw1-net-oi?lookback=${lookback}`)
       .then((res) => setData(res.data.data))
       .catch((err) => console.error("Error loading OI data", err));
   }, [lookback]);

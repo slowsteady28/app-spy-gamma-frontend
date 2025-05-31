@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type CallWallChartProps = {
   lookback: number;
   selectedRange: [number, number] | null;
@@ -33,7 +35,7 @@ function CallWallChart({
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/cw1-history?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/cw1-history?lookback=${lookback}`)
       .then((res) => {
         console.log("Call Wall Chart Data:", res.data);
         setData(res.data);

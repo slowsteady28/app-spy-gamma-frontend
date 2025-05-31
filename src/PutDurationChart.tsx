@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 type PutDurationChartProps = {
   lookback: number;
 };
@@ -23,7 +25,7 @@ function PutDurationChart({ lookback }: PutDurationChartProps) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/data/pw1-duration?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw1-duration?lookback=${lookback}`)
       .then((res) => {
         console.log("Put Duration Data:", res.data);
         setData(res.data);

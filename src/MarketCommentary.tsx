@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw"; // enables raw HTML rendering
 
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
 interface CommentaryEntry {
   date: string;
   markdown: string;
@@ -13,7 +15,7 @@ export default function MarketCommentary() {
   const [currentTime, setCurrentTime] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/market-commentary")
+    fetch("${apiBaseUrl}/api/market-commentary")
       .then((res) => res.json())
       .then((data) => setData(data))
       .catch((err) => console.error("Failed to fetch commentary:", err));
