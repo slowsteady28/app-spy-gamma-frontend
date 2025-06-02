@@ -2,7 +2,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const apiBaseUrl = import.meta.env.VITE_API_URL;
+////////////////////////////////////////////////////////////////////////////////
+// Ensure you have the correct API base URL set in your environment variables
+const apiBaseUrl = import.meta.env.VITE_API_URL; // || "http://127.0.0.1:8000";
 
 function PutWallMetrics() {
   const [data, setData] = useState<any>(null);

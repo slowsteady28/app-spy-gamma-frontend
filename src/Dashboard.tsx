@@ -30,34 +30,43 @@ function Dashboard() {
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       <div
-        style={{
-          width: "200px",
-          background: "#2c3e50",
-          padding: "1rem",
-          color: "white",
-        }}
+        className="d-flex flex-column flex-shrink-0 p-3 bg-dark text-white"
+        style={{ width: "200px", height: "100vh" }}
       >
-        <h3>Menu</h3>
-        <button
-          onClick={() => setViewMode("overview")}
-          style={{ marginBottom: "1rem", display: "block" }}
+        <a
+          href="/"
+          className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none"
         >
-          Overview
-        </button>
-        <button
-          onClick={() => setViewMode("dashboard")}
-          style={{ marginBottom: "1rem", display: "block" }}
-        >
-          Dashboard
-        </button>
-        <button
-          onClick={() => setViewMode("commentary")}
-          style={{ display: "block" }}
-        >
-          Commentary
-        </button>
+          <span className="fs-4">SPY Gamma</span>
+        </a>
+        <hr />
+        <ul className="nav nav-pills flex-column mb-auto">
+          <li className="nav-item">
+            <button
+              className="nav-link text-white"
+              onClick={() => setViewMode("overview")}
+            >
+              Overview
+            </button>
+          </li>
+          <li>
+            <button
+              className="nav-link text-white"
+              onClick={() => setViewMode("dashboard")}
+            >
+              Dashboard
+            </button>
+          </li>
+          <li>
+            <button
+              className="nav-link text-white"
+              onClick={() => setViewMode("commentary")}
+            >
+              Commentary
+            </button>
+          </li>
+        </ul>
       </div>
-
       <div style={{ flex: 1, overflowY: "auto", padding: "1rem" }}>
         {viewMode === "commentary" && <MarketCommentary />}
         {viewMode === "overview" && <OverView />}

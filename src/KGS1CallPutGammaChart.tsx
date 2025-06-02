@@ -10,7 +10,9 @@ import {
   Legend,
 } from "recharts";
 
-const apiBaseUrl = import.meta.env.VITE_API_URL;
+////////////////////////////////////////////////////////////////////////////////
+// Ensure you have the correct API base URL set in your environment variables
+const apiBaseUrl = import.meta.env.VITE_API_URL; // || "http://127.0.0.1:8000";
 
 type GammaDataPoint = {
   date: string;
