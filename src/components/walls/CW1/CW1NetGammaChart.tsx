@@ -11,7 +11,7 @@ import {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ensure you have the correct API base URL set in your environment variables
-const apiBaseUrl = import.meta.env.VITE_API_URL; // || "http://127.0.0.1:8000";
+const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 type CallNetGammaChartProps = {
   lookback: number;
@@ -22,7 +22,7 @@ type NetGammaDataPoint = {
   gamma: number;
 };
 
-function CallNetGammaChart({ lookback }: CallNetGammaChartProps) {
+function CW1NetGammaChart({ lookback }: CallNetGammaChartProps) {
   const [data, setData] = useState<NetGammaDataPoint[]>([]);
 
   useEffect(() => {
@@ -68,4 +68,4 @@ function CallNetGammaChart({ lookback }: CallNetGammaChartProps) {
   );
 }
 
-export default CallNetGammaChart;
+export default CW1NetGammaChart;

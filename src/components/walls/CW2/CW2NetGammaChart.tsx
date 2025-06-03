@@ -1,60 +1,64 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
-  BarChart,
   Bar,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  BarChart,
 } from "recharts";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ensure you have the correct API base URL set in your environment variables
 const apiBaseUrl = import.meta.env.VITE_API_URL; // || "http://127.0.0.1:8000";
 
-type CallDurationChartProps = {
+type CallNetGammaChartProps = {
   lookback: number;
 };
 
-type DurationDataPoint = {
+type NetGammaDataPoint = {
   date: string;
-  duration: number;
+  gamma: number;
 };
 
-console.log("Using API Base URL:", apiBaseUrl);
-console.log("1234");
-
-function CallDurationChart({ lookback }: CallDurationChartProps) {
-  const [data, setData] = useState<DurationDataPoint[]>([]);
+function CW2NetGammaChart({ lookback }: CallNetGammaChartProps) {
+  const [data, setData] = useState<NetGammaDataPoint[]>([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/cw1-duration?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/cw2-net-gamma?lookback=${lookback}`)
       .then((res) => {
-        console.log("Duration Chart Data:", res.data);
+        console.log("Net Gamma Data:", res.data);
         setData(res.data);
       })
-      .catch((err) => console.error("Error loading duration data", err));
+      .catch((err) => console.error("Error loading Net Gamma data", err));
   }, [lookback]);
 
-  const min = Math.min(...data.map((d) => d.duration ?? 0));
-  const max = Math.max(...data.map((d) => d.duration ?? 0));
+  const minGamma = Math.min(...data.map((d) => d.gamma ?? 0));
+  const maxGamma = Math.max(...data.map((d) => d.gamma ?? 0));
 
   return (
     <div className="my-4">
-      <h4>Average Call Gamma Duration</h4>
+      <h4>Net Call Gamma</h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
-          <YAxis domain={[min, max]} />
+          <YAxis
+            domain={[minGamma, maxGamma]}
+            label={{
+              value: "Net Gamma",
+              angle: -90,
+              position: "insideLeft",
+            }}
+          />
           <Tooltip
             cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
           />
           <Bar
-            dataKey="duration"
-            name="Duration"
-            fill="steelblue"
+            dataKey="gamma"
+            name="Net Gamma"
+            fill="#0066cc"
             barSize={14}
             opacity={0.8}
           />
@@ -64,4 +68,4 @@ function CallDurationChart({ lookback }: CallDurationChartProps) {
   );
 }
 
-export default CallDurationChart;
+export default CW2NetGammaChart;

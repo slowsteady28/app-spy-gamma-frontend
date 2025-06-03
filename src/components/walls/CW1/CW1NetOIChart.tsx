@@ -12,7 +12,7 @@ import axios from "axios";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ensure you have the correct API base URL set in your environment variables
-const apiBaseUrl = import.meta.env.VITE_API_URL; // || "http://127.0.0.1:8000";
+const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 type NetOIChartProps = {
   lookback: number;
@@ -22,7 +22,7 @@ type NetOIChartProps = {
   setActiveIndex: (index: number | null) => void;
 };
 
-function CallNetOIChart({
+function CW1NetOIChart({
   lookback,
   selectedRange,
   setSelectedRange,
@@ -67,4 +67,4 @@ function CallNetOIChart({
   );
 }
 
-export default CallNetOIChart;
+export default CW1NetOIChart;

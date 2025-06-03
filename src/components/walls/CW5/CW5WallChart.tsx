@@ -13,7 +13,7 @@ import {
 // Ensure you have the correct API base URL set in your environment variables
 const apiBaseUrl = import.meta.env.VITE_API_URL; // || "http://127.0.0.1:8000";
 
-type PutWallChartProps = {
+type CallWallChartProps = {
   lookback: number;
   selectedRange: [number, number] | null;
   setSelectedRange: (range: [number, number]) => void;
@@ -21,43 +21,43 @@ type PutWallChartProps = {
   setActiveIndex: (index: number | null) => void;
 };
 
-type PW1DataPoint = {
+type CW1DataPoint = {
   date: string;
-  pw1: number;
+  cw1: number;
 };
 
-function PutWallChart({
+function CW5WallChart({
   lookback,
   selectedRange,
   setSelectedRange,
   activeIndex,
   setActiveIndex,
-}: PutWallChartProps) {
-  const [data, setData] = useState<PW1DataPoint[]>([]);
+}: CallWallChartProps) {
+  const [data, setData] = useState<CW1DataPoint[]>([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/pw1-history?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/cw5-history?lookback=${lookback}`)
       .then((res) => {
-        console.log("Put Wall Chart Data:", res.data);
+        console.log("Call Wall Chart Data:", res.data);
         setData(res.data);
       })
-      .catch((err) => console.error("Error loading PW1 data", err));
+      .catch((err) => console.error("Error loading CW1 data", err));
   }, [lookback]);
 
-  const minPW1 = Math.min(...data.map((d) => d.pw1));
-  const maxPW1 = Math.max(...data.map((d) => d.pw1));
+  const minCW1 = Math.min(...data.map((d) => d.cw1));
+  const maxCW1 = Math.max(...data.map((d) => d.cw1));
 
   return (
     <div className="my-4">
-      <h4>Put Wall</h4>
+      <h4>Call Wall</h4>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
-            domain={[minPW1, maxPW1]}
+            domain={[minCW1, maxCW1]}
             label={{
-              value: "Put Wall (PW1)",
+              value: "Call Wall (CW1)",
               angle: -90,
               position: "insideLeft",
             }}
@@ -67,9 +67,9 @@ function PutWallChart({
           />
           <Line
             type="monotone"
-            dataKey="pw1"
-            stroke="purple"
-            name="PW1"
+            dataKey="cw1"
+            stroke="orange"
+            name="CW1"
             strokeWidth={2}
             activeDot={{ r: 6 }}
           />
@@ -79,4 +79,4 @@ function PutWallChart({
   );
 }
 
-export default PutWallChart;
+export default CW5WallChart;

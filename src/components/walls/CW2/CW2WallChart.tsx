@@ -26,7 +26,7 @@ type CW1DataPoint = {
   cw1: number;
 };
 
-function CallWallChart({
+function CW2WallChart({
   lookback,
   selectedRange,
   setSelectedRange,
@@ -37,7 +37,7 @@ function CallWallChart({
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/cw1-history?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/cw2-history?lookback=${lookback}`)
       .then((res) => {
         console.log("Call Wall Chart Data:", res.data);
         setData(res.data);
@@ -79,4 +79,4 @@ function CallWallChart({
   );
 }
 
-export default CallWallChart;
+export default CW2WallChart;

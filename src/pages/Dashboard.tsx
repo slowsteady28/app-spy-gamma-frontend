@@ -1,18 +1,18 @@
 import { useState } from "react";
-import CallWallChart from "./CallWallChart";
-import CallNetOIChart from "./CallNetOIChart";
-import CallDurationChart from "./CallDurationChart";
-import CallNetGammaChart from "./CallNetGammaChart";
+import CallWallChart from "../components/walls/CW1/CallWallChart";
+import CallNetOIChart from "../components/walls/CW1/CallNetOIChart";
+import CallDurationChart from "../components/walls/CW1/CallDurationChart";
+import CallNetGammaChart from "../components/walls/CW1/CallNetGammaChart";
 
-import PutWallChart from "./PutWallChart";
-import PutDurationChart from "./PutDurationChart";
-import PutNetGammaChart from "./PutNetGammaChart";
-import PutNetOIChart from "./PutNetOIChart";
+import PutWallChart from "../components/walls/Put/PutWallChart";
+import PutDurationChart from "../components/walls/Put/PutDurationChart";
+import PutNetGammaChart from "../components/walls/Put/PutNetGammaChart";
+import PutNetOIChart from "../components/walls/Put/PutNetOIChart";
 
-import KGS1CallPutGammaChart from "./KGS1CallPutGammaChart";
-import KGS1NetOIChart from "./KGS1NetOIChart";
-import KGS1GammaChart from "./KGS1HisGammaChart";
-import KGS1DurationChart from "./KGS1DurationChart";
+import KGS1CallPutGammaChart from "../components/walls/KeyGamma/KGS1CallPutGammaChart";
+import KGS1NetOIChart from "../components/walls/KeyGamma/KGS1NetOIChart";
+import KGS1GammaChart from "../components/walls/KeyGamma/KGS1HisGammaChart";
+import KGS1DurationChart from "../components/walls/KeyGamma/KGS1DurationChart";
 
 import MarketCommentary from "./MarketCommentary";
 import OverView from "./Overview";
