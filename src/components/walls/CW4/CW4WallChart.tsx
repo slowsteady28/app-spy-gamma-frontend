@@ -11,7 +11,7 @@ import {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ensure you have the correct API base URL set in your environment variables
-const apiBaseUrl = import.meta.env.VITE_API_URL; // || "http://127.0.0.1:8000";
+const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 type CallWallChartProps = {
   lookback: number;
@@ -42,7 +42,7 @@ function CW4WallChart({
         console.log("Call Wall Chart Data:", res.data);
         setData(res.data);
       })
-      .catch((err) => console.error("Error loading CW1 data", err));
+      .catch((err) => console.error("Error loading CW4 data", err));
   }, [lookback]);
 
   const minCW1 = Math.min(...data.map((d) => d.cw1));
@@ -57,7 +57,7 @@ function CW4WallChart({
           <YAxis
             domain={[minCW1, maxCW1]}
             label={{
-              value: "Call Wall (CW1)",
+              value: "Call Wall (CW4)",
               angle: -90,
               position: "insideLeft",
             }}
@@ -67,9 +67,9 @@ function CW4WallChart({
           />
           <Line
             type="monotone"
-            dataKey="cw1"
+            dataKey="cw4"
             stroke="orange"
-            name="CW1"
+            name="CW4"
             strokeWidth={2}
             activeDot={{ r: 6 }}
           />

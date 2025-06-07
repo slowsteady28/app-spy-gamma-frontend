@@ -1,64 +1,57 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
+  BarChart,
   Bar,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
 } from "recharts";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ensure you have the correct API base URL set in your environment variables
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-type PutNetGammaChartProps = {
+type PutDurationChartProps = {
   lookback: number;
 };
 
-type NetGammaDataPoint = {
+type DurationDataPoint = {
   date: string;
-  gamma: number;
+  duration: number;
 };
 
-function PutNetGammaChart({ lookback }: PutNetGammaChartProps) {
-  const [data, setData] = useState<NetGammaDataPoint[]>([]);
+function PW1DurationChart({ lookback }: PutDurationChartProps) {
+  const [data, setData] = useState<DurationDataPoint[]>([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/pw1-net-gamma?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw1-duration?lookback=${lookback}`)
       .then((res) => {
-        console.log("PW1 Net Gamma Data:", res.data);
+        console.log("Put Duration Data:", res.data);
         setData(res.data);
       })
-      .catch((err) => console.error("Error loading PW1 net gamma data", err));
+      .catch((err) => console.error("Error loading PW1 duration data", err));
   }, [lookback]);
 
-  const minGamma = Math.min(...data.map((d) => d.gamma ?? 0));
-  const maxGamma = Math.max(...data.map((d) => d.gamma ?? 0));
+  const min = Math.min(...data.map((d) => d.duration ?? 0));
+  const max = Math.max(...data.map((d) => d.duration ?? 0));
 
   return (
     <div className="my-4">
-      <h4>Net Put Gamma</h4>
+      <h4>Average Put Gamma Duration</h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
-          <YAxis
-            domain={[minGamma, maxGamma]}
-            label={{
-              value: "Net Gamma",
-              angle: -90,
-              position: "insideLeft",
-            }}
-          />
+          <YAxis domain={[min, max]} />
           <Tooltip
             cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
           />
           <Bar
-            dataKey="gamma"
-            name="Net Gamma"
-            fill="#9933cc"
+            dataKey="duration"
+            name="Duration"
+            fill="steelblue"
             barSize={14}
             opacity={0.8}
           />
@@ -68,4 +61,4 @@ function PutNetGammaChart({ lookback }: PutNetGammaChartProps) {
   );
 }
 
-export default PutNetGammaChart;
+export default PW1DurationChart;

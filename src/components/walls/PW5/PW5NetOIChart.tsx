@@ -22,7 +22,7 @@ type NetOIChartProps = {
   setActiveIndex: (index: number | null) => void;
 };
 
-function PutNetOIChart({
+function PW5NetOIChart({
   lookback,
   selectedRange,
   setSelectedRange,
@@ -34,9 +34,9 @@ function PutNetOIChart({
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/pw1-net-oi?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw5-net-oi?lookback=${lookback}`)
       .then((res) => setData(res.data.data))
-      .catch((err) => console.error("Error loading PW1 OI data", err));
+      .catch((err) => console.error("Error loading PW5 OI data", err));
   }, [lookback]);
 
   useEffect(() => {
@@ -67,4 +67,4 @@ function PutNetOIChart({
   );
 }
 
-export default PutNetOIChart;
+export default PW5NetOIChart;

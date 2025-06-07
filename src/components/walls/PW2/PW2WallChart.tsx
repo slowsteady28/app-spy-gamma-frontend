@@ -13,7 +13,7 @@ import {
 // Ensure you have the correct API base URL set in your environment variables
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-type CallWallChartProps = {
+type PutWallChartProps = {
   lookback: number;
   selectedRange: [number, number] | null;
   setSelectedRange: (range: [number, number]) => void;
@@ -21,43 +21,43 @@ type CallWallChartProps = {
   setActiveIndex: (index: number | null) => void;
 };
 
-type CW1DataPoint = {
+type PW2DataPoint = {
   date: string;
-  cw1: number;
+  pw2: number;
 };
 
-function CW5WallChart({
+function PW2WallChart({
   lookback,
   selectedRange,
   setSelectedRange,
   activeIndex,
   setActiveIndex,
-}: CallWallChartProps) {
-  const [data, setData] = useState<CW1DataPoint[]>([]);
+}: PutWallChartProps) {
+  const [data, setData] = useState<PW2DataPoint[]>([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/cw5-history?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw2-history?lookback=${lookback}`)
       .then((res) => {
-        console.log("Call Wall Chart Data:", res.data);
+        console.log("Put Wall Chart Data:", res.data);
         setData(res.data);
       })
-      .catch((err) => console.error("Error loading CW5 data", err));
+      .catch((err) => console.error("Error loading PW2 data", err));
   }, [lookback]);
 
-  const minCW1 = Math.min(...data.map((d) => d.cw1));
-  const maxCW1 = Math.max(...data.map((d) => d.cw1));
+  const minPW2 = Math.min(...data.map((d) => d.pw2));
+  const maxPW2 = Math.max(...data.map((d) => d.pw2));
 
   return (
     <div className="my-4">
-      <h4>Call Wall</h4>
+      <h4>Put Wall</h4>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
-            domain={[minCW1, maxCW1]}
+            domain={[minPW2, maxPW2]}
             label={{
-              value: "Call Wall (CW5)",
+              value: "Put Wall (PW2)",
               angle: -90,
               position: "insideLeft",
             }}
@@ -67,9 +67,9 @@ function CW5WallChart({
           />
           <Line
             type="monotone"
-            dataKey="cw5"
-            stroke="orange"
-            name="CW5"
+            dataKey="pw2"
+            stroke="purple"
+            name="PW2"
             strokeWidth={2}
             activeDot={{ r: 6 }}
           />
@@ -79,4 +79,4 @@ function CW5WallChart({
   );
 }
 
-export default CW5WallChart;
+export default PW2WallChart;

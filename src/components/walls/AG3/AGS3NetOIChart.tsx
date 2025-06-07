@@ -18,14 +18,14 @@ type Props = {
   lookback: number;
 };
 
-function KGS1NetOIChart({ lookback }: Props) {
+function AGS3NetOIChart({ lookback }: Props) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/kgs1-net-oi?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/ags3-net-oi?lookback=${lookback}`)
       .then((res) => setData(res.data.data))
-      .catch((err) => console.error("Error loading KGS1 Net OI", err));
+      .catch((err) => console.error("Error loading AGS3 Net OI", err));
   }, [lookback]);
 
   return (
@@ -46,4 +46,4 @@ function KGS1NetOIChart({ lookback }: Props) {
   );
 }
 
-export default KGS1NetOIChart;
+export default AGS3NetOIChart;

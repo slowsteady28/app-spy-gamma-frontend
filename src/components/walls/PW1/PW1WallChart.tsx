@@ -26,7 +26,7 @@ type PW1DataPoint = {
   pw1: number;
 };
 
-function PutWallChart({
+function PW1WallChart({
   lookback,
   selectedRange,
   setSelectedRange,
@@ -79,4 +79,4 @@ function PutWallChart({
   );
 }
 
-export default PutWallChart;
+export default PW1WallChart;

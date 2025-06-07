@@ -13,7 +13,7 @@ import {
 // Ensure you have the correct API base URL set in your environment variables
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-type CallNetGammaChartProps = {
+type PutNetGammaChartProps = {
   lookback: number;
 };
 
@@ -22,17 +22,17 @@ type NetGammaDataPoint = {
   gamma: number;
 };
 
-function CW4NetGammaChart({ lookback }: CallNetGammaChartProps) {
+function PW2NetGammaChart({ lookback }: PutNetGammaChartProps) {
   const [data, setData] = useState<NetGammaDataPoint[]>([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/cw4-net-gamma?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw2-net-gamma?lookback=${lookback}`)
       .then((res) => {
-        console.log("Net Gamma Data:", res.data);
+        console.log("PW2 Net Gamma Data:", res.data);
         setData(res.data);
       })
-      .catch((err) => console.error("Error loading Net Gamma data", err));
+      .catch((err) => console.error("Error loading PW2 net gamma data", err));
   }, [lookback]);
 
   const minGamma = Math.min(...data.map((d) => d.gamma ?? 0));
@@ -40,7 +40,7 @@ function CW4NetGammaChart({ lookback }: CallNetGammaChartProps) {
 
   return (
     <div className="my-4">
-      <h4>Net Call Gamma</h4>
+      <h4>Net Put Gamma</h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
@@ -58,7 +58,7 @@ function CW4NetGammaChart({ lookback }: CallNetGammaChartProps) {
           <Bar
             dataKey="gamma"
             name="Net Gamma"
-            fill="#0066cc"
+            fill="#9933cc"
             barSize={14}
             opacity={0.8}
           />
@@ -68,4 +68,4 @@ function CW4NetGammaChart({ lookback }: CallNetGammaChartProps) {
   );
 }
 
-export default CW4NetGammaChart;
+export default PW2NetGammaChart;

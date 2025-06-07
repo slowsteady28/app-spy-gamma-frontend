@@ -22,17 +22,17 @@ type DurationDataPoint = {
   duration: number;
 };
 
-function PutDurationChart({ lookback }: PutDurationChartProps) {
+function PW5DurationChart({ lookback }: PutDurationChartProps) {
   const [data, setData] = useState<DurationDataPoint[]>([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/pw1-duration?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw5-duration?lookback=${lookback}`)
       .then((res) => {
         console.log("Put Duration Data:", res.data);
         setData(res.data);
       })
-      .catch((err) => console.error("Error loading PW1 duration data", err));
+      .catch((err) => console.error("Error loading PW5 duration data", err));
   }, [lookback]);
 
   const min = Math.min(...data.map((d) => d.duration ?? 0));
@@ -61,4 +61,4 @@ function PutDurationChart({ lookback }: PutDurationChartProps) {
   );
 }
 
-export default PutDurationChart;
+export default PW5DurationChart;

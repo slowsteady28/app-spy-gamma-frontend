@@ -22,7 +22,7 @@ type NetOIChartProps = {
   setActiveIndex: (index: number | null) => void;
 };
 
-function CW2NetOIChart({
+function PW3NetOIChart({
   lookback,
   selectedRange,
   setSelectedRange,
@@ -34,9 +34,9 @@ function CW2NetOIChart({
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/cw2-net-oi?lookback=${lookback}`)
+      .get(`${apiBaseUrl}/data/pw3-net-oi?lookback=${lookback}`)
       .then((res) => setData(res.data.data))
-      .catch((err) => console.error("Error loading OI data", err));
+      .catch((err) => console.error("Error loading PW3 OI data", err));
   }, [lookback]);
 
   useEffect(() => {
@@ -67,4 +67,4 @@ function CW2NetOIChart({
   );
 }
 
-export default CW2NetOIChart;
+export default PW3NetOIChart;

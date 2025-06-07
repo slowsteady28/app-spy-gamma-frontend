@@ -18,32 +18,32 @@ type Props = {
   lookback: number;
 };
 
-function KGS1DurationChart({ lookback }: Props) {
+function AGS1NetOIChart({ lookback }: Props) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/data/kgs1-duration?lookback=${lookback}`)
-      .then((res) => setData(res.data))
-      .catch((err) => console.error("Error loading KGS1 Duration", err));
+      .get(`${apiBaseUrl}/data/ags1-net-oi?lookback=${lookback}`)
+      .then((res) => setData(res.data.data))
+      .catch((err) => console.error("Error loading AGS1 Net OI", err));
   }, [lookback]);
 
   return (
     <div className="my-4">
-      <h4>Call & Put Gamma Duration</h4>
-      <ResponsiveContainer width="100%" height={300}>
+      <h4>Call/Put Open Interest Change</h4>
+      <ResponsiveContainer width="100%" height={400}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis />
           <Tooltip
             cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
           />
-          <Bar dataKey="call_duration" name="Call Duration" fill="#3366cc" />
-          <Bar dataKey="put_duration" name="Put Duration" fill="#cc3366" />
+          <Bar dataKey="call_oi" name="Call OI Δ" fill="#33cc33" />
+          <Bar dataKey="put_oi" name="Put OI Δ" fill="#cc3333" />
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
-export default KGS1DurationChart;
+export default AGS1NetOIChart;
