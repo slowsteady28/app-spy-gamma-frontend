@@ -2,7 +2,7 @@ import { Container, Row, Col, Card } from "react-bootstrap";
 
 import AGS3StrikeChart from "./AGS3HisGammaChart";
 import AGS3NetOIChart from "./AGS3NetOIChart";
-import AGS3NetGammaChart from "./AGS3CallPutGammaChart";
+import AGS3CallPutGammaChart from "./AGS3CallPutGammaChart";
 import AGS3DurationChart from "./AGS3DurationChart";
 
 const AGS3AppReady = () => {
@@ -23,7 +23,7 @@ const AGS3AppReady = () => {
             <AGS3NetOIChart lookback={25} />
           </Col>
           <Col md={6}>
-            <AGS3NetGammaChart lookback={25} />
+            <AGS3CallPutGammaChart lookback={25} />
           </Col>
           <Col md={6}>
             <AGS3DurationChart lookback={25} />
