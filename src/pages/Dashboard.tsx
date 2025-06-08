@@ -86,6 +86,7 @@ function Dashboard() {
     <Router>
       <MainLayout>
         <Routes>
+          <Route path="/" element={<CallWallsTopFive />} />
           <Route path="/cw-top-5" element={<CallWallsTopFive />} />
           {CallWalls.map((Wall, index) => {
             const { path, CallWall } = Wall;
