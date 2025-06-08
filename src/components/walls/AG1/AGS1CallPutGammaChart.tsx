@@ -26,6 +26,7 @@ type Props = {
 
 function AGS1CallPutGammaChart({ lookback }: Props) {
   const [data, setData] = useState<GammaDataPoint[]>([]);
+  console.log(lookback, "lookback");
 
   useEffect(() => {
     axios

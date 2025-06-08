@@ -1,5 +1,5 @@
-import React from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { useState } from "react";
+import { Container, Row, Col, Card, Form } from "react-bootstrap";
 
 // Import AGS1–ABS3 charts
 import AGS1StrikeChart from "./AG1/AGS1HisGammaChart";
@@ -18,6 +18,12 @@ import AGS3CallPutGammaChart from "./AG3/AGS3CallPutGammaChart";
 import AGS3DurationChart from "./AG3/AGS3DurationChart";
 
 const AbsGammaTopThree = () => {
+  const [lookback, setLookback] = useState<number>(25);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLookback(Number(e.target.value));
+  };
+
   const walls = [
     {
       title: "AGS1 - Largest Wall",
@@ -60,18 +66,28 @@ const AbsGammaTopThree = () => {
             >
               {title}
             </Card.Title>
+            {/* Dropdown Menu for Lookback Period Selection */}
+            <Form.Group as={Col} md="3" className="mb-4">
+              <Form.Label>Lookback Period</Form.Label>
+              <Form.Select value={lookback} onChange={handleChange}>
+                <option value={25}>25 Days</option>
+                <option value={50}>50 Days</option>
+                <option value={100}>100 Days</option>
+                <option value={200}>200 Days</option>
+              </Form.Select>
+            </Form.Group>
             <Row className="g-3">
               <Col md={6}>
-                <WallChart lookback={25} />
+                <WallChart lookback={lookback} />
               </Col>
               <Col md={6}>
-                <NetOIChart lookback={25} />
+                <NetOIChart lookback={lookback} />
               </Col>
               <Col md={6}>
-                <AGS1CallPutGammaChart lookback={25} />
+                <CallPutGammaChart lookback={lookback} />
               </Col>
               <Col md={6}>
-                <DurationChart lookback={25} />
+                <DurationChart lookback={lookback} />
               </Col>
             </Row>
           </Card>
