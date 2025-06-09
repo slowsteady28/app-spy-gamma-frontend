@@ -27,13 +27,33 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Navigation */}
         <ul className="nav flex-column">
+          {/*
           <li className="nav-item mb-2">
             <a className="nav-link text-white" href="/dashboard">
               Dashboard
             </a>
           </li>
+          */}
 
           {/* CALL WALLS Section */}
+          <li className="nav-item mt-3">
+            <a href="/commentary">
+              <div
+                className="d-flex align-items-center text-white"
+                style={{
+                  cursor: "pointer",
+                  padding: "0.5rem 1.5rem",
+                  backgroundColor: "#212529",
+                  borderRadius: "5px",
+                }}
+              >
+                <i className="bi bi-journal-text me-2"></i>
+                <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                  COMMENTARY
+                </span>
+              </div>
+            </a>
+          </li>
           <li className="nav-item">
             <div
               onClick={() => setShowCallWalls(!showCallWalls)}
@@ -46,7 +66,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               className="d-flex justify-content-between align-items-center"
             >
               <div className="d-flex align-items-center text-white">
-                <i className="bi bi-bar-chart-fill me-2"></i>
+                <i className="bi bi-graph-up me-2"></i>
                 <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
                   CALL WALLS
                 </span>
@@ -96,7 +116,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               className="d-flex justify-content-between align-items-center"
             >
               <div className="d-flex align-items-center text-white">
-                <i className="bi bi-bar-chart-fill me-2"></i>
+                <i className="bi bi-graph-down me-2"></i>
                 <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
                   PUT WALLS
                 </span>
@@ -134,7 +154,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           </li>
 
           {/* ABSOLUTE GAMMA Section */}
-          <li className="nav-item">
+          <li className="nav-item mt-3">
             <div
               onClick={() => setShowAbsGammaStrikes(!showAbsGammaStrikes)}
               style={{
@@ -146,7 +166,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               className="d-flex justify-content-between align-items-center"
             >
               <div className="d-flex align-items-center text-white">
-                <i className="bi bi-bar-chart-fill me-2"></i>
+                <i className="bi bi-bar-chart-steps me-2"></i>
                 <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
                   ABS GAMMA
                 </span>
@@ -181,12 +201,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                 ))}
               </ul>
             )}
-          </li>
-
-          <li className="nav-item mt-3">
-            <a className="nav-link text-white" href="/commentary">
-              Commentary
-            </a>
           </li>
         </ul>
       </div>
