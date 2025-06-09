@@ -1,5 +1,5 @@
-import React from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { useState } from "react";
+import { Container, Row, Col, Card, Form } from "react-bootstrap";
 
 // Import PW1–PW5 charts
 import PW1WallChart from "./PW1/PW1WallChart";
@@ -28,6 +28,11 @@ import PW5NetGammaChart from "./PW5/PW5NetGammaChart";
 import PW5DurationChart from "./PW5/PW5DurationChart";
 
 const PutWallsTopFive = () => {
+  const [lookback, setLookback] = useState<number>(25);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLookback(Number(e.target.value));
+  };
   const walls = [
     {
       title: "PW1 - Largest Wall",
@@ -79,10 +84,20 @@ const PutWallsTopFive = () => {
             >
               {title}
             </Card.Title>
+            {/* Dropdown Menu for Lookback Period Selection */}
+            <Form.Group as={Col} md="3" className="mb-4">
+              <Form.Label>Lookback Period</Form.Label>
+              <Form.Select value={lookback} onChange={handleChange}>
+                <option value={25}>25 Days</option>
+                <option value={50}>50 Days</option>
+                <option value={100}>100 Days</option>
+                <option value={200}>200 Days</option>
+              </Form.Select>
+            </Form.Group>
             <Row className="g-3">
               <Col md={6}>
                 <WallChart
-                  lookback={25}
+                  lookback={lookback}
                   selectedRange={null}
                   setSelectedRange={() => {}}
                   activeIndex={null}
@@ -91,7 +106,7 @@ const PutWallsTopFive = () => {
               </Col>
               <Col md={6}>
                 <NetOIChart
-                  lookback={25}
+                  lookback={lookback}
                   selectedRange={null}
                   setSelectedRange={() => {}}
                   activeIndex={null}
@@ -99,10 +114,10 @@ const PutWallsTopFive = () => {
                 />
               </Col>
               <Col md={6}>
-                <NetGammaChart lookback={25} />
+                <NetGammaChart lookback={lookback} />
               </Col>
               <Col md={6}>
-                <DurationChart lookback={25} />
+                <DurationChart lookback={lookback} />
               </Col>
             </Row>
           </Card>
