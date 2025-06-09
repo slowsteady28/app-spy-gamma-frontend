@@ -1,23 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const [showCallWalls, setShowCallWalls] = useState(true);
   const [showPutWalls, setShowPutWalls] = useState(true);
   const [showAbsGammaStrikes, setShowAbsGammaStrikes] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 576);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 576);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="d-flex">
+      {/* Mobile Toggle Button */}
+      <button
+        className="btn btn-dark d-sm-none position-fixed top-0 start-0 m-3 zindex-tooltip"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        style={{ zIndex: 1050 }}
+      >
+        ☰
+      </button>
+
       {/* Sidebar */}
       <div
-        className="d-flex flex-column bg-dark text-white p-3"
-        style={{ width: "235px", height: "100vh", position: "fixed" }}
+        className={`bg-dark text-white p-3 flex-column position-fixed h-100 ${
+          sidebarOpen ? "d-flex" : "d-none"
+        } d-sm-flex`}
+        style={{ width: "235px", zIndex: 1040 }}
       >
         {/* Branding */}
         <div className="mb-3">
           <h3 className="text-white">SPY Gamma</h3>
         </div>
 
-        {/* Divider Line */}
         <hr
           style={{
             borderTop: "1px solid rgb(255, 255, 255)",
@@ -27,15 +45,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Navigation */}
         <ul className="nav flex-column">
-          {/*
-          <li className="nav-item mb-2">
-            <a className="nav-link text-white" href="/dashboard">
-              Dashboard
-            </a>
-          </li>
-          */}
-
-          {/* CALL WALLS Section */}
+          {/* COMMENTARY */}
           <li className="nav-item mt-3">
             <a href="/commentary">
               <div
@@ -54,6 +64,8 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </a>
           </li>
+
+          {/* CALL WALLS */}
           <li className="nav-item">
             <div
               onClick={() => setShowCallWalls(!showCallWalls)}
@@ -103,7 +115,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             )}
           </li>
 
-          {/* PUT WALLS Section */}
+          {/* PUT WALLS */}
           <li className="nav-item mt-3">
             <div
               onClick={() => setShowPutWalls(!showPutWalls)}
@@ -153,7 +165,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             )}
           </li>
 
-          {/* ABSOLUTE GAMMA Section */}
+          {/* ABS GAMMA */}
           <li className="nav-item mt-3">
             <div
               onClick={() => setShowAbsGammaStrikes(!showAbsGammaStrikes)}
@@ -209,9 +221,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       <div
         className="flex-grow-1 p-4"
         style={{
-          marginLeft: "250px",
+          marginLeft: isDesktop || sidebarOpen ? "235px" : "0",
           backgroundColor: "#f8f9fa",
           minHeight: "100vh",
+          transition: "margin-left 0.3s ease",
         }}
       >
         {children}
