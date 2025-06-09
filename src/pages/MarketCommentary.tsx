@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw"; // enables raw HTML rendering
+import MarketCommentaryCard from "./MarketCommentaryCard";
 
-////////////////////////////////////////////////////////////////////////////////
-// Ensure you have the correct API base URL set in your environment variables
+// ✅ Set up correct API base
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 interface CommentaryEntry {
   date: string;
   markdown: string;
-  images: { src: string; caption: string }[];
 }
 
-console.log("Here: API Base URL:", apiBaseUrl);
 export default function MarketCommentary() {
   const [data, setData] = useState<CommentaryEntry[]>([]);
   const [currentTime, setCurrentTime] = useState("");
@@ -36,56 +32,22 @@ export default function MarketCommentary() {
   }, []);
 
   return (
-    <div
-      style={{
-        padding: "1rem",
-        color: "#ffffff",
-        backgroundColor: "#1f2937",
-        minHeight: "100vh",
-        fontFamily: "sans-serif",
-      }}
-    >
-      <h1
-        style={{
-          fontSize: "1.75rem",
-          marginBottom: "1.5rem",
-          fontWeight: "bold",
-        }}
-      >
-        Market Commentary
-      </h1>
+    <div className="container py-4">
+      <h2 className="fw-bold mb-4">🧠 SPY Gamma Market Commentary</h2>
 
-      {data.map((entry, index) => (
-        <div key={index} style={{ marginBottom: "2rem" }}>
-          <h2
-            style={{
-              fontSize: "1.2rem",
-              fontWeight: "600",
-              marginBottom: "0.5rem",
-            }}
-          >
-            {entry.date}
-          </h2>
+      {data.length === 0 ? (
+        <p>Loading commentary...</p>
+      ) : (
+        data.map((entry) => (
+          <MarketCommentaryCard
+            key={entry.date}
+            date={entry.date}
+            markdown={entry.markdown}
+          />
+        ))
+      )}
 
-          <div style={{ marginBottom: "1rem", lineHeight: "1.6" }}>
-            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-              {entry.markdown}
-            </ReactMarkdown>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-              gap: "1rem",
-            }}
-          ></div>
-        </div>
-      ))}
-
-      <p style={{ fontSize: "0.8rem", marginTop: "2rem", color: "#aaa" }}>
-        Updated: {currentTime}
-      </p>
+      <p className="text-muted small mt-4">Last updated: {currentTime}</p>
     </div>
   );
 }
