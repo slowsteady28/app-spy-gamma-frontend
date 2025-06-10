@@ -66,16 +66,31 @@ export default function MarketCommentary() {
         {loading ? (
           <>
             {[1, 2].map((n) => (
-              <div className="col-12 col-sm-12 col-md-6 col-xl-6 d-flex" key={n}>
+              <div
+                className="col-12 col-sm-12 col-md-6 col-xl-6 d-flex"
+                key={n}
+              >
                 <div className="card border-0 shadow-sm h-100 w-100 bg-body-emphasis d-flex flex-column">
                   <div className="card-header bg-transparent border-0 pb-0">
-                    <span className="badge bg-secondary placeholder col-6" style={{ height: "1.5em" }} />
+                    <span
+                      className="badge bg-secondary placeholder col-6"
+                      style={{ height: "1.5em" }}
+                    />
                   </div>
                   <div className="card-body pt-2 d-flex flex-column">
                     <div className="placeholder-glow">
-                      <span className="placeholder col-12 mb-2" style={{ height: "1em" }}></span>
-                      <span className="placeholder col-10 mb-2" style={{ height: "1em" }}></span>
-                      <span className="placeholder col-8" style={{ height: "1em" }}></span>
+                      <span
+                        className="placeholder col-12 mb-2"
+                        style={{ height: "1em" }}
+                      ></span>
+                      <span
+                        className="placeholder col-10 mb-2"
+                        style={{ height: "1em" }}
+                      ></span>
+                      <span
+                        className="placeholder col-8"
+                        style={{ height: "1em" }}
+                      ></span>
                     </div>
                   </div>
                 </div>
