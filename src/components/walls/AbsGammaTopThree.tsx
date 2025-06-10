@@ -50,49 +50,82 @@ const AbsGammaTopThree = () => {
 
   return (
     <Container fluid className="mt-4">
-      {walls.map((wall, index) => {
-        const {
-          title,
-          WallChart,
-          NetOIChart,
-          CallPutGammaChart,
-          DurationChart,
-        } = wall;
-        return (
-          <Card key={index} className="mb-4 shadow-sm rounded-4 p-3">
-            <Card.Title
-              className="mb-3"
-              style={{ fontSize: "1.2rem", fontWeight: 600 }}
-            >
-              {title}
-            </Card.Title>
-            {/* Dropdown Menu for Lookback Period Selection */}
-            <Form.Group as={Col} md="3" className="mb-4">
-              <Form.Label>Lookback Period</Form.Label>
-              <Form.Select value={lookback} onChange={handleChange}>
-                <option value={25}>25 Days</option>
-                <option value={50}>50 Days</option>
-                <option value={100}>100 Days</option>
-                <option value={200}>200 Days</option>
-              </Form.Select>
-            </Form.Group>
-            <Row className="g-3">
-              <Col md={6}>
-                <WallChart lookback={lookback} />
-              </Col>
-              <Col md={6}>
-                <NetOIChart lookback={lookback} />
-              </Col>
-              <Col md={6}>
-                <CallPutGammaChart lookback={lookback} />
-              </Col>
-              <Col md={6}>
-                <DurationChart lookback={lookback} />
-              </Col>
-            </Row>
-          </Card>
-        );
-      })}
+      <Row className="mb-4 align-items-end">
+        <Col>
+          <h2 className="mb-1 text-dark fw-bold">📊 ABS GAMMA</h2>
+          <h5 className="text-body-tertiary fw-semibold mb-0">
+            Top 3 Absolute Gamma Strikes
+          </h5>
+        </Col>
+      </Row>
+      <Row className="g-4">
+        {walls.map((wall, index) => {
+          const {
+            title,
+            WallChart,
+            NetOIChart,
+            CallPutGammaChart,
+            DurationChart,
+          } = wall;
+          return (
+            <Col xs={12} key={index} className="d-flex">
+              <Card className="border-0 shadow-sm bg-body-emphasis d-flex flex-column h-100 w-100">
+                <Card.Header className="bg-transparent border-0 pb-0 d-flex align-items-center gap-2">
+                  <span
+                    className="text-success"
+                    aria-hidden="true"
+                    style={{ fontSize: "1.25rem" }}
+                  >
+                    📊
+                  </span>
+                  <span className="fw-semibold">{title}</span>
+                </Card.Header>
+                <Card.Body>
+                  <Form.Group as={Col} md="6" className="mb-4">
+                    <Form.Label>Lookback Period</Form.Label>
+                    <Form.Select
+                      value={lookback}
+                      onChange={handleChange}
+                      aria-label="Select lookback period"
+                    >
+                      <option value={25}>25 Days</option>
+                      <option value={50}>50 Days</option>
+                      <option value={100}>100 Days</option>
+                      <option value={200}>200 Days</option>
+                    </Form.Select>
+                  </Form.Group>
+                  <Row className="g-3">
+                    <Col xs={12}>
+                      <WallChart
+                        lookback={lookback}
+                        selectedRange={null}
+                        setSelectedRange={() => {}}
+                        activeIndex={null}
+                        setActiveIndex={() => {}}
+                      />
+                    </Col>
+                    <Col xs={12}>
+                      <NetOIChart
+                        lookback={lookback}
+                        selectedRange={null}
+                        setSelectedRange={() => {}}
+                        activeIndex={null}
+                        setActiveIndex={() => {}}
+                      />
+                    </Col>
+                    <Col xs={12}>
+                      <CallPutGammaChart lookback={lookback} />
+                    </Col>
+                    <Col xs={12}>
+                      <DurationChart lookback={lookback} />
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+          );
+        })}
+      </Row>
     </Container>
   );
 };

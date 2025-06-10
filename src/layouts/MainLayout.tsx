@@ -107,7 +107,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                       href={`/cw${n}`}
                       style={{ fontSize: "0.85rem" }}
                     >
-                      {n === 1 ? "Largest Wall" : `${n}th Largest Wall`}
+                      {n === 1
+                        ? "Largest Wall"
+                        : n === 2
+                        ? "2nd Largest Wall"
+                        : n === 3
+                        ? "3rd Largest Wall"
+                        : `${n}th Largest Wall`}
                     </a>
                   </li>
                 ))}
@@ -157,7 +163,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                       href={`/pw${n}`}
                       style={{ fontSize: "0.85rem" }}
                     >
-                      {n === 1 ? "Largest Wall" : `${n}th Largest Wall`}
+                      {n === 1
+                        ? "Largest Wall"
+                        : n === 2
+                        ? "2nd Largest Wall"
+                        : n === 3
+                        ? "3rd Largest Wall"
+                        : `${n}th Largest Wall`}
                     </a>
                   </li>
                 ))}
@@ -207,7 +219,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                       href={`/absgamma${n}`}
                       style={{ fontSize: "0.85rem" }}
                     >
-                      {n === 1 ? "Largest Wall" : `${n}th Largest Wall`}
+                      {n === 1
+                        ? "Largest Wall"
+                        : n === 2
+                        ? "2nd Largest Wall"
+                        : n === 3
+                        ? "3rd Largest Wall"
+                        : `${n}th Largest Wall`}
                     </a>
                   </li>
                 ))}

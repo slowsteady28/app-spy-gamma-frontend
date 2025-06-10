@@ -74,15 +74,6 @@ const CallWallsTopFive = () => {
 
   return (
     <Container fluid className="mt-4">
-      {/* Dashboard-style header */}
-      <Row className="mb-4 align-items-end">
-        <Col>
-          <h2 className="mb-1 text-dark fw-bold">📈 Call Walls</h2>
-          <h5 className="text-body-tertiary fw-semibold mb-0">
-            Key resistance levels in the market
-          </h5>
-        </Col>
-      </Row>
       <Row className="g-4">
         {walls.map((wall, index) => {
           const { title, WallChart, NetOIChart, NetGammaChart, DurationChart } =
