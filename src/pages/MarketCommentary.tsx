@@ -16,6 +16,7 @@ export default function MarketCommentary() {
   const [data, setData] = useState<CommentaryEntry[]>([]);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showTopBtn, setShowTopBtn] = useState(false);
 
   // Fetch logic as a function
   const fetchCommentary = () => {
@@ -33,6 +34,19 @@ export default function MarketCommentary() {
     fetchCommentary();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Show button when scrolled down
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowTopBtn(window.scrollY > 200);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="container py-4 px-2 px-md-4">
@@ -117,6 +131,27 @@ export default function MarketCommentary() {
           ))
         )}
       </div>
+
+      {/* Back to Top Button */}
+      {showTopBtn && (
+        <button
+          type="button"
+          className="btn btn-primary position-fixed"
+          style={{
+            bottom: "2rem",
+            right: "2rem",
+            zIndex: 1050,
+            borderRadius: "50%",
+            width: "3rem",
+            height: "3rem",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          }}
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+        >
+          <span style={{ fontSize: "1.5rem" }}>↑</span>
+        </button>
+      )}
     </div>
   );
 }
