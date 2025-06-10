@@ -50,14 +50,6 @@ const AbsGammaTopThree = () => {
 
   return (
     <Container fluid className="mt-4">
-      <Row className="mb-4 align-items-end">
-        <Col>
-          <h2 className="mb-1 text-dark fw-bold">📊 ABS GAMMA</h2>
-          <h5 className="text-body-tertiary fw-semibold mb-0">
-            Top 3 Absolute Gamma Strikes
-          </h5>
-        </Col>
-      </Row>
       <Row className="g-4">
         {walls.map((wall, index) => {
           const {
