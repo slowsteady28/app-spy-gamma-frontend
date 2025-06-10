@@ -1,40 +1,24 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
-import { Card } from "react-bootstrap";
 
-interface MarketCommentaryCardProps {
+interface Props {
   date: string;
   markdown: string;
 }
 
-const MarketCommentaryCard: React.FC<MarketCommentaryCardProps> = ({
-  date,
-  markdown,
-}) => {
+export default function MarketCommentaryCard({ date, markdown }: Props) {
   return (
-    <Card className="mb-4 shadow rounded-3">
-      <Card.Header className="bg-dark text-white fw-bold fs-5">
-        📅 {formatDate(date)}
-      </Card.Header>
-      <Card.Body className="fs-6" style={{ whiteSpace: "pre-wrap" }}>
-        <ReactMarkdown>{markdown}</ReactMarkdown>
-      </Card.Body>
-    </Card>
+    <div className="card border-0 shadow-sm h-100 w-100 bg-body-emphasis d-flex flex-column">
+      <div className="card-header bg-transparent border-0 pb-0">
+        <span className="badge bg-primary-subtle text-primary fw-semibold fs-10">
+          {date}
+        </span>
+      </div>
+      <div className="card-body pt-2 d-flex flex-column">
+        <div className="text-body">
+          <ReactMarkdown>{markdown}</ReactMarkdown>
+        </div>
+      </div>
+    </div>
   );
-};
-
-// Optional: Converts '06-09-2025' to 'June 9, 2025'
-function formatDate(dateStr: string): string {
-  try {
-    const parsed = new Date(dateStr);
-    return parsed.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  } catch {
-    return dateStr;
-  }
 }
-
-export default MarketCommentaryCard;
