@@ -96,22 +96,10 @@ const AbsGammaTopThree = () => {
                   </Form.Group>
                   <Row className="g-3">
                     <Col xs={12}>
-                      <WallChart
-                        lookback={lookback}
-                        selectedRange={null}
-                        setSelectedRange={() => {}}
-                        activeIndex={null}
-                        setActiveIndex={() => {}}
-                      />
+                      <WallChart lookback={lookback} />
                     </Col>
                     <Col xs={12}>
-                      <NetOIChart
-                        lookback={lookback}
-                        selectedRange={null}
-                        setSelectedRange={() => {}}
-                        activeIndex={null}
-                        setActiveIndex={() => {}}
-                      />
+                      <NetOIChart lookback={lookback} />
                     </Col>
                     <Col xs={12}>
                       <CallPutGammaChart lookback={lookback} />
