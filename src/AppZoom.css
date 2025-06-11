@@ -11,7 +11,7 @@
 /* For iPhone and similar small screens */
 @media (max-width: 600px) {
   .app-zoom-wrapper {
-    transform: scale(0.8);
+    transform: scale(0.95);
     width: 125vw;   /* 100 / 0.8 */
     height: 125vh;
   }
