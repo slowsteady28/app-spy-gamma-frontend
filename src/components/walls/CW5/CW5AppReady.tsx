@@ -16,9 +16,10 @@ const CW5AppReady = () => {
   return (
     <Container fluid className="mt-4">
       <Row className="justify-content-center">
+        {/* Make the card take nearly the full width on all screens */}
         <Col xs={12} className="d-flex">
           <Card className="border-0 shadow-sm bg-body-emphasis d-flex flex-column h-100 w-100">
-            <Card.Header className="bg-transparent border-0 pb-0 d-flex align-items-center gap-2">
+            <Card.Header className="bg-transparent border-0 pb-0 d-flex align-items-center">
               <span
                 className="text-primary"
                 aria-hidden="true"
@@ -26,22 +27,31 @@ const CW5AppReady = () => {
               >
                 📈
               </span>
-              <span className="fw-semibold">CW5 - 5th Largest Wall</span>
+              <span className="fw-semibold ms-2">CW5 - 5th Largest Wall</span>
+              <div className="ms-auto d-flex align-items-center">
+                <div className="d-flex flex-column align-items-end">
+                  <span
+                    className="text-secondary small fw-bold mb-1"
+                    style={{ letterSpacing: "0.02em" }}
+                  >
+                    Lookback Period
+                  </span>
+                  <Form.Select
+                    value={lookback}
+                    onChange={handleChange}
+                    aria-label="Select lookback period"
+                    size="sm"
+                    style={{ minWidth: 120 }}
+                  >
+                    <option value={25}>25 Days</option>
+                    <option value={50}>50 Days</option>
+                    <option value={100}>100 Days</option>
+                    <option value={200}>200 Days</option>
+                  </Form.Select>
+                </div>
+              </div>
             </Card.Header>
             <Card.Body>
-              <Form.Group as={Col} md="6" className="mb-4">
-                <Form.Label>Lookback Period</Form.Label>
-                <Form.Select
-                  value={lookback}
-                  onChange={handleChange}
-                  aria-label="Select lookback period"
-                >
-                  <option value={25}>25 Days</option>
-                  <option value={50}>50 Days</option>
-                  <option value={100}>100 Days</option>
-                  <option value={200}>200 Days</option>
-                </Form.Select>
-              </Form.Group>
               <Row className="g-4">
                 <Col xs={12} className="d-flex">
                   <Card className="border-0 shadow-sm bg-body-emphasis d-flex flex-column h-100 w-100">

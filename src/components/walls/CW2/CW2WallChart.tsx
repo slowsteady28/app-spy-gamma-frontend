@@ -21,9 +21,9 @@ type CallWallChartProps = {
   setActiveIndex: (index: number | null) => void;
 };
 
-type CW1DataPoint = {
+type CW2DataPoint = {
   date: string;
-  cw1: number;
+  cw2: number;
 };
 
 function CW2WallChart({
@@ -33,7 +33,8 @@ function CW2WallChart({
   activeIndex,
   setActiveIndex,
 }: CallWallChartProps) {
-  const [data, setData] = useState<CW1DataPoint[]>([]);
+  const [data, setData] = useState<CW2DataPoint[]>([]);
+  const lineColor = "#0d6efd";
 
   useEffect(() => {
     axios
@@ -45,33 +46,40 @@ function CW2WallChart({
       .catch((err) => console.error("Error loading CW2 data", err));
   }, [lookback]);
 
-  const minCW1 = Math.min(...data.map((d) => d.cw1));
-  const maxCW1 = Math.max(...data.map((d) => d.cw1));
+  const minCW2 = Math.min(...data.map((d) => d.cw2)) - 5;
+  const maxCW2 = Math.max(...data.map((d) => d.cw2)) + 5;
 
   return (
     <div className="my-4">
-      <h4>Call Wall</h4>
-      <ResponsiveContainer width="100%" height={300}>
+      <h4
+        className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
+        style={{
+          letterSpacing: "0.05em",
+          fontWeight: 700,
+        }}
+      >
+        Call Wall
+      </h4>
+      <ResponsiveContainer width="100%" height={380}>
         <LineChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
-            domain={[minCW1, maxCW1]}
-            label={{
-              value: "Call Wall (CW2)",
-              angle: -90,
-              position: "insideLeft",
-            }}
+            domain={[minCW2, maxCW2]}
+            tickMargin={12}
+            axisLine={{ stroke: "#ccc", strokeWidth: 1 }}
+            tickLine={false}
           />
           <Tooltip
-            cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
+            cursor={{ stroke: "#0d6efd", strokeWidth: 2, opacity: 0.7 }}
           />
           <Line
             type="monotone"
             dataKey="cw2"
-            stroke="orange"
+            stroke={lineColor}
             name="CW2"
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
+            strokeWidth={3}
+            dot={{ r: 3, stroke: lineColor, fill: "#fff" }}
+            activeDot={{ r: 5, stroke: lineColor, fill: "#fff" }}
           />
         </LineChart>
       </ResponsiveContainer>
