@@ -10,7 +10,6 @@ import {
 } from "recharts";
 
 ////////////////////////////////////////////////////////////////////////////////
-// Ensure you have the correct API base URL set in your environment variables
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 type CallDurationChartProps = {
@@ -28,25 +27,44 @@ function CW4DurationChart({ lookback }: CallDurationChartProps) {
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/cw4-duration?lookback=${lookback}`)
-      .then((res) => {
-        console.log("Duration Chart Data:", res.data);
-        setData(res.data);
-      })
+      .then((res) => setData(res.data))
       .catch((err) => console.error("Error loading duration data", err));
   }, [lookback]);
 
-  const min = Math.min(...data.map((d) => d.duration ?? 0));
-  const max = Math.max(...data.map((d) => d.duration ?? 0));
+  const min = Math.round(Math.min(...data.map((d) => d.duration ?? 0)));
+  const max = Math.round(Math.max(...data.map((d) => d.duration ?? 0)));
+
+  // Custom tooltip formatter for commas
+  const tooltipFormatter = (value: number) =>
+    value?.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
   return (
     <div className="my-4">
-      <h4>Average Call Gamma Duration</h4>
+      <h4
+        className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
+        style={{
+          letterSpacing: "0.05em",
+          fontWeight: 700,
+        }}
+      >
+        Duration (the average of the # of days till expiration)
+      </h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
-          <YAxis domain={[min, max]} />
+          <YAxis
+            domain={[min, max]}
+            tickFormatter={(value) =>
+              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
+            }
+          />
           <Tooltip
-            cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
+            cursor={{
+              stroke: "rgb(191, 23, 45)",
+              strokeWidth: 2,
+              opacity: 0.7,
+            }}
+            formatter={tooltipFormatter}
           />
           <Bar
             dataKey="duration"

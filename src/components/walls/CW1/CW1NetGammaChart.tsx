@@ -29,31 +29,54 @@ function CW1NetGammaChart({ lookback }: CallNetGammaChartProps) {
     axios
       .get(`${apiBaseUrl}/data/cw1-net-gamma?lookback=${lookback}`)
       .then((res) => {
-        console.log("Net Gamma Data:", res.data);
-        setData(res.data);
+        // Divide gamma by 10,000,000 for each data point
+        const transformed = res.data.map((d: NetGammaDataPoint) => ({
+          ...d,
+          gamma: d.gamma / 10000,
+        }));
+        setData(transformed);
       })
       .catch((err) => console.error("Error loading Net Gamma data", err));
   }, [lookback]);
 
-  const minGamma = Math.min(...data.map((d) => d.gamma ?? 0));
-  const maxGamma = Math.max(...data.map((d) => d.gamma ?? 0));
+  const minGamma = Math.round(
+    Math.min(...data.map((d) => d.gamma ?? 0)) / 10000
+  );
+  const maxGamma = Math.round(
+    Math.max(...data.map((d) => d.gamma ?? 0)) / 10000
+  );
+
+  // Custom tooltip formatter for commas
+  const tooltipFormatter = (value: number) =>
+    value?.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
   return (
     <div className="my-4">
-      <h4>Net Call Gamma</h4>
+      <h4
+        className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
+        style={{
+          letterSpacing: "0.05em",
+          fontWeight: 700,
+        }}
+      >
+        Net Call Gamma (in 10,000s)
+      </h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
+            tickFormatter={(value) =>
+              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
+            }
             domain={[minGamma, maxGamma]}
-            label={{
-              value: "Net Gamma",
-              angle: -90,
-              position: "insideLeft",
-            }}
           />
           <Tooltip
-            cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
+            cursor={{
+              stroke: "rgb(191, 23, 45)",
+              strokeWidth: 2,
+              opacity: 0.7,
+            }}
+            formatter={tooltipFormatter}
           />
           <Bar
             dataKey="gamma"

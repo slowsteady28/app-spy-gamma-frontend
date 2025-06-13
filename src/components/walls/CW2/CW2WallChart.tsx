@@ -24,6 +24,7 @@ type CallWallChartProps = {
 type CW2DataPoint = {
   date: string;
   cw2: number;
+  price: number;
 };
 
 function CW2WallChart({
@@ -35,12 +36,12 @@ function CW2WallChart({
 }: CallWallChartProps) {
   const [data, setData] = useState<CW2DataPoint[]>([]);
   const lineColor = "#0d6efd";
+  const priceColor = "#6c757d";
 
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/cw2-history?lookback=${lookback}`)
       .then((res) => {
-        console.log("Call Wall Chart Data:", res.data);
         setData(res.data);
       })
       .catch((err) => console.error("Error loading CW2 data", err));
@@ -50,7 +51,7 @@ function CW2WallChart({
   const maxCW2 = Math.max(...data.map((d) => d.cw2)) + 5;
 
   return (
-    <div className="my-4">
+    <div className="my-1">
       <h4
         className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
         style={{
@@ -64,22 +65,38 @@ function CW2WallChart({
         <LineChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
+            yAxisId="left"
             domain={[minCW2, maxCW2]}
             tickMargin={12}
             axisLine={{ stroke: "#ccc", strokeWidth: 1 }}
             tickLine={false}
           />
           <Tooltip
-            cursor={{ stroke: "#0d6efd", strokeWidth: 2, opacity: 0.7 }}
+            cursor={{
+              stroke: "rgb(191, 23, 45)",
+              strokeWidth: 2,
+              opacity: 0.7,
+            }}
           />
           <Line
+            yAxisId="left"
             type="monotone"
             dataKey="cw2"
-            stroke={lineColor}
+            stroke="rgb(191, 23, 45)"
             name="CW2"
             strokeWidth={3}
-            dot={{ r: 3, stroke: lineColor, fill: "#fff" }}
-            activeDot={{ r: 5, stroke: lineColor, fill: "#fff" }}
+            dot={{ r: 3, stroke: "rgb(191, 23, 45)", fill: "#fff" }}
+            activeDot={{ r: 5, stroke: "rgb(191, 23, 45)", fill: "#fff" }}
+          />
+          <Line
+            yAxisId="left"
+            type="monotone"
+            dataKey="price"
+            stroke={priceColor}
+            name="Price"
+            strokeWidth={2}
+            dot={false}
+            activeDot={false}
           />
         </LineChart>
       </ResponsiveContainer>

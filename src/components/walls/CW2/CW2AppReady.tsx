@@ -7,7 +7,7 @@ import CW2NetGammaChart from "./CW2NetGammaChart";
 import CW2DurationChart from "./CW2DurationChart";
 
 const CW2AppReady = () => {
-  const [lookback, setLookback] = useState<number>(25);
+  const [lookback, setLookback] = useState<number>(200); // Default to 200 days
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookback(Number(e.target.value));

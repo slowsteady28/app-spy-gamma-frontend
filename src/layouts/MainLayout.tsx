@@ -191,7 +191,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                     href="/cw-top-5"
                     style={{
                       fontSize: "0.85rem",
-                      color: isActive("/cw-top-5") ? "#0d6efd" : "#212529",
+                      color: isActive("/cw-top-5")
+                        ? "rgb(191, 23, 45)"
+                        : "#212529", // <-- Updated color
                       backgroundColor: "transparent",
                       borderRadius: "5px",
                       padding: "0.5rem 1.5rem",
@@ -209,7 +211,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         href={href}
                         style={{
                           fontSize: "0.85rem",
-                          color: isActive(href) ? "#0d6efd" : "#212529",
+                          color: isActive(href)
+                            ? "rgb(191, 23, 45)" // <-- Active link color for Call Walls
+                            : "#212529",
                           backgroundColor: "transparent",
                           borderRadius: "5px",
                           padding: "0.5rem 1.5rem",

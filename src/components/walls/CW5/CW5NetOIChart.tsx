@@ -49,15 +49,36 @@ function CW5NetOIChart({
     ? data.slice(selectedRange[0], selectedRange[1] + 1)
     : data;
 
+  // Custom tooltip formatter for commas
+  const tooltipFormatter = (value: number) =>
+    value?.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
   return (
     <div className="my-4">
-      <h4>Call/Put Open Interest Change</h4>
+      <h4
+        className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
+        style={{
+          letterSpacing: "0.05em",
+          fontWeight: 700,
+        }}
+      >
+        Change in Open Interest (Δ OI)
+      </h4>
       <ResponsiveContainer width="100%" height={400} key={containerWidth}>
         <BarChart data={slicedData} syncId="spy-sync">
           <XAxis dataKey="date" />
-          <YAxis />
+          <YAxis
+            tickFormatter={(value) =>
+              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
+            }
+          />
           <Tooltip
-            cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
+            cursor={{
+              stroke: "rgb(191, 23, 45)",
+              strokeWidth: 2,
+              opacity: 0.7,
+            }}
+            formatter={tooltipFormatter}
           />
           <Bar dataKey="call_oi" fill="green" name="Call OI Δ" barSize={16} />
           <Bar dataKey="put_oi" fill="red" name="Put OI Δ" barSize={16} />

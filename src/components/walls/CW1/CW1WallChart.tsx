@@ -35,8 +35,8 @@ function CW1WallChart({
   setActiveIndex,
 }: CallWallChartProps) {
   const [data, setData] = useState<CW1DataPoint[]>([]);
-  const lineColor = "#0d6efd";
-  const priceColor = "#28a745"; // Green for price
+  const lineColor = "rgb(191, 23, 45)";
+  const priceColor = "#6c757d"; // Green for price
 
   useEffect(() => {
     axios
@@ -50,11 +50,9 @@ function CW1WallChart({
 
   const minCW1 = Math.min(...data.map((d) => d.cw1)) - 5;
   const maxCW1 = Math.max(...data.map((d) => d.cw1)) + 5;
-  const minPrice = Math.min(...data.map((d) => d.price)) - 5;
-  const maxPrice = Math.max(...data.map((d) => d.price)) + 5;
 
   return (
-    <div className="my-4">
+    <div className="my-1">
       <h4
         className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
         style={{
@@ -76,17 +74,21 @@ function CW1WallChart({
           />
 
           <Tooltip
-            cursor={{ stroke: "#0d6efd", strokeWidth: 2, opacity: 0.7 }}
+            cursor={{
+              stroke: "rgb(191, 23, 45)",
+              strokeWidth: 2,
+              opacity: 0.7,
+            }}
           />
           <Line
             yAxisId="left"
             type="monotone"
             dataKey="cw1"
-            stroke={lineColor}
+            stroke="rgb(191, 23, 45)" // <-- Set the color here
             name="CW1"
             strokeWidth={3}
-            dot={{ r: 3, stroke: lineColor, fill: "#fff" }}
-            activeDot={{ r: 5, stroke: lineColor, fill: "#fff" }}
+            dot={{ r: 3, stroke: "rgb(191, 23, 45)", fill: "#fff" }}
+            activeDot={{ r: 5, stroke: "rgb(191, 23, 45)", fill: "#fff" }}
           />
           <Line
             yAxisId="left"
