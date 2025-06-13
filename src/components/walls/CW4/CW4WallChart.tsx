@@ -7,6 +7,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Brush,
 } from "recharts";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,6 +99,12 @@ function CW4WallChart({
             strokeWidth={2}
             dot={false}
             activeDot={false}
+          />
+          <Brush
+            dataKey="date"
+            height={24}
+            stroke="rgb(191, 23, 45)"
+            travellerWidth={8}
           />
         </LineChart>
       </ResponsiveContainer>

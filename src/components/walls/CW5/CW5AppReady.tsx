@@ -7,7 +7,7 @@ import CW5NetGammaChart from "./CW5NetGammaChart";
 import CW5DurationChart from "./CW5DurationChart";
 
 const CW5AppReady = () => {
-  const [lookback, setLookback] = useState<number>(200); // Default to 200 days
+  const [lookback, setLookback] = useState<number>(400); // Default to 200 days
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookback(Number(e.target.value));
@@ -47,6 +47,7 @@ const CW5AppReady = () => {
                     <option value={50}>50 Days</option>
                     <option value={100}>100 Days</option>
                     <option value={200}>200 Days</option>
+                    <option value={400}>400 Days</option>
                   </Form.Select>
                 </div>
               </div>

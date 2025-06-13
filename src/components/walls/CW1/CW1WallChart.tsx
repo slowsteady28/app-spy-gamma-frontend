@@ -7,10 +7,9 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Brush,
 } from "recharts";
 
-////////////////////////////////////////////////////////////////////////////////
-// Ensure you have the correct API base URL set in your environment variables
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 type CallWallChartProps = {
@@ -24,7 +23,7 @@ type CallWallChartProps = {
 type CW1DataPoint = {
   date: string;
   cw1: number;
-  price: number; // <-- Add this line
+  price: number;
 };
 
 function CW1WallChart({
@@ -36,7 +35,7 @@ function CW1WallChart({
 }: CallWallChartProps) {
   const [data, setData] = useState<CW1DataPoint[]>([]);
   const lineColor = "rgb(191, 23, 45)";
-  const priceColor = "#6c757d"; // Green for price
+  const priceColor = "#6c757d";
 
   useEffect(() => {
     axios
@@ -72,10 +71,9 @@ function CW1WallChart({
             axisLine={{ stroke: "#ccc", strokeWidth: 1 }}
             tickLine={false}
           />
-
           <Tooltip
             cursor={{
-              stroke: "rgb(191, 23, 45)",
+              stroke: lineColor,
               strokeWidth: 2,
               opacity: 0.7,
             }}
@@ -84,11 +82,11 @@ function CW1WallChart({
             yAxisId="left"
             type="monotone"
             dataKey="cw1"
-            stroke="rgb(191, 23, 45)" // <-- Set the color here
+            stroke={lineColor}
             name="CW1"
             strokeWidth={3}
-            dot={{ r: 3, stroke: "rgb(191, 23, 45)", fill: "#fff" }}
-            activeDot={{ r: 5, stroke: "rgb(191, 23, 45)", fill: "#fff" }}
+            dot={{ r: 3, stroke: lineColor, fill: "#fff" }}
+            activeDot={{ r: 5, stroke: lineColor, fill: "#fff" }}
           />
           <Line
             yAxisId="left"
@@ -99,6 +97,12 @@ function CW1WallChart({
             strokeWidth={2}
             dot={false}
             activeDot={false}
+          />
+          <Brush
+            dataKey="date"
+            height={24}
+            stroke={lineColor}
+            travellerWidth={8}
           />
         </LineChart>
       </ResponsiveContainer>

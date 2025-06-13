@@ -28,7 +28,7 @@ import CW5NetGammaChart from "./CW5/CW5NetGammaChart";
 import CW5DurationChart from "./CW5/CW5DurationChart";
 
 const CallWallsTopFive = () => {
-  const [lookback, setLookback] = useState<number>(200);
+  const [lookback, setLookback] = useState<number>(400);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookback(Number(e.target.value));
