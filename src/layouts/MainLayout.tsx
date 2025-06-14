@@ -269,7 +269,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                     href="/pw-top-5"
                     style={{
                       fontSize: "0.85rem",
-                      color: isActive("/pw-top-5") ? "#0d6efd" : "#212529",
+                      color: isActive("/pw-top-5") ? "#6f42c1" : "#212529", // <-- Purple for active
                       backgroundColor: "transparent",
                       borderRadius: "5px",
                       padding: "0.5rem 1.5rem",
@@ -287,7 +287,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         href={href}
                         style={{
                           fontSize: "0.85rem",
-                          color: isActive(href) ? "#0d6efd" : "#212529",
+                          color: isActive(href) ? "#6f42c1" : "#212529", // <-- Purple for active
                           backgroundColor: "transparent",
                           borderRadius: "5px",
                           padding: "0.5rem 1.5rem",

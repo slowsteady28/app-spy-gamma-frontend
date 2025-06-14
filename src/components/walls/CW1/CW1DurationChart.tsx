@@ -51,7 +51,7 @@ function CW1DurationChart({ lookback }: CallDurationChartProps) {
           fontWeight: 700,
         }}
       >
-        Duration (the average of the # of days till expiration)
+        Duration (average # of days till expiration*)
       </h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">

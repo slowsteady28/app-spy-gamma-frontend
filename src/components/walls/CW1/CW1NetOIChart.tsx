@@ -62,7 +62,7 @@ function CW1NetOIChart({
           fontWeight: 700,
         }}
       >
-        Change in Open Interest (Δ OI)
+        Δ OI
       </h4>
       <ResponsiveContainer width="100%" height={400} key={containerWidth}>
         <BarChart data={slicedData} syncId="spy-sync">

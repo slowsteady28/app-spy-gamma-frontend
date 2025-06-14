@@ -38,27 +38,67 @@ function PW1NetGammaChart({ lookback }: PutNetGammaChartProps) {
   const minGamma = Math.min(...data.map((d) => d.gamma ?? 0));
   const maxGamma = Math.max(...data.map((d) => d.gamma ?? 0));
 
+  const mainColor = "#6f42c1";
+
   return (
-    <div className="my-4">
-      <h4>Net Put Gamma</h4>
+    <div
+      className="my-1"
+      style={{
+        background: "linear-gradient(90deg, #f8f9fa 60%, #ede7f6 100%)", // Match Put Wall background
+        borderRadius: "12px",
+        boxShadow: "0 2px 12px 0 rgba(111,66,193,0.07)",
+        padding: "1.5rem 1rem",
+      }}
+    >
+      <h4
+        className="text-uppercase mb-2 mt-1 ps-2"
+        style={{
+          letterSpacing: "0.05em",
+          fontWeight: 900,
+          color: "#6f42c1",
+          fontSize: "1.25rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          textShadow: "0 1px 4px rgba(111,66,193,0.08)",
+          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
+        }}
+      >
+        <span
+          style={{
+            display: "inline-block",
+            background: "linear-gradient(90deg, #6f42c1 60%, #b39ddb 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontWeight: 900,
+            letterSpacing: "0.08em",
+          }}
+        >
+          Net Put Gamma
+        </span>
+      </h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
             domain={[minGamma, maxGamma]}
-            label={{
-              value: "Net Gamma",
-              angle: -90,
-              position: "insideLeft",
-            }}
+            tickFormatter={(value) =>
+              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
+            }
+            tickMargin={12}
+            axisLine={{ stroke: "#ccc", strokeWidth: 1 }}
+            tickLine={false}
           />
           <Tooltip
-            cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
+            cursor={{ stroke: mainColor, strokeWidth: 2, opacity: 0.7 }}
+            formatter={(value: number) =>
+              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
+            }
           />
           <Bar
             dataKey="gamma"
             name="Net Gamma"
-            fill="#9933cc"
+            fill={mainColor}
             barSize={14}
             opacity={0.8}
           />

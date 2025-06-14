@@ -30,12 +30,6 @@ const CW4AppReady = () => {
               <span className="fw-semibold ms-2">CW4 - 4th Largest Wall</span>
               <div className="ms-auto d-flex align-items-center">
                 <div className="d-flex flex-column align-items-end">
-                  <span
-                    className="text-secondary small fw-bold mb-1"
-                    style={{ letterSpacing: "0.02em" }}
-                  >
-                    Lookback Period
-                  </span>
                   <Form.Select
                     value={lookback}
                     onChange={handleChange}
