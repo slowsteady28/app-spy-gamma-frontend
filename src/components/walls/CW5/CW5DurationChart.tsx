@@ -9,10 +9,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-////////////////////////////////////////////////////////////////////////////////
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-type CallDurationChartProps = {
+type PutDurationChartProps = {
   lookback: number;
 };
 
@@ -21,33 +20,60 @@ type DurationDataPoint = {
   duration: number;
 };
 
-function CW5DurationChart({ lookback }: CallDurationChartProps) {
+const mainColor = "#0096b4";
+
+function CW5DurationChart({ lookback }: PutDurationChartProps) {
   const [data, setData] = useState<DurationDataPoint[]>([]);
 
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/cw5-duration?lookback=${lookback}`)
-      .then((res) => setData(res.data))
-      .catch((err) => console.error("Error loading duration data", err));
+      .then((res) => {
+        console.log("Put Duration Data:", res.data);
+        setData(res.data);
+      })
+      .catch((err) => console.error("Error loading CW5 duration data", err));
   }, [lookback]);
 
-  const min = Math.round(Math.min(...data.map((d) => d.duration ?? 0)));
-  const max = Math.round(Math.max(...data.map((d) => d.duration ?? 0)));
-
-  // Custom tooltip formatter for commas
-  const tooltipFormatter = (value: number) =>
-    value?.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const min = Math.min(...data.map((d) => d.duration ?? 0));
+  const max = Math.max(...data.map((d) => d.duration ?? 0));
 
   return (
-    <div className="my-4">
+    <div
+      className="my-1"
+      style={{
+        background: "linear-gradient(90deg, #f8f9fa 60%, #d0f0f7 100%)",
+        borderRadius: "12px",
+        boxShadow: "0 2px 12px 0 rgba(0,150,180,0.07)",
+        padding: "1.5rem 1rem",
+      }}
+    >
       <h4
-        className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
+        className="text-uppercase mb-2 mt-1 ps-2"
         style={{
           letterSpacing: "0.05em",
-          fontWeight: 700,
+          fontWeight: 900,
+          color: mainColor,
+          fontSize: "1.25rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          textShadow: "0 1px 4px rgba(0,150,180,0.08)",
+          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
         }}
       >
-        Duration (the average of the # of days till expiration)
+        <span
+          style={{
+            display: "inline-block",
+            background: "linear-gradient(90deg, #0096b4 60%, #33cbe0 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontWeight: 900,
+            letterSpacing: "0.08em",
+          }}
+        >
+          Duration (Average # of days till expiration*)
+        </span>
       </h4>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
@@ -57,19 +83,20 @@ function CW5DurationChart({ lookback }: CallDurationChartProps) {
             tickFormatter={(value) =>
               value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
             }
+            tickMargin={12}
+            axisLine={{ stroke: "#ccc", strokeWidth: 1 }}
+            tickLine={false}
           />
           <Tooltip
-            cursor={{
-              stroke: "rgb(191, 23, 45)",
-              strokeWidth: 2,
-              opacity: 0.7,
-            }}
-            formatter={tooltipFormatter}
+            cursor={{ stroke: mainColor, strokeWidth: 2, opacity: 0.7 }}
+            formatter={(value: number) =>
+              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
+            }
           />
           <Bar
             dataKey="duration"
             name="Duration"
-            fill="steelblue"
+            fill={mainColor}
             barSize={14}
             opacity={0.8}
           />

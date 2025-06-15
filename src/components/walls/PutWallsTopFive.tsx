@@ -28,7 +28,7 @@ import PW5NetGammaChart from "./PW5/PW5NetGammaChart";
 import PW5DurationChart from "./PW5/PW5DurationChart";
 
 const PutWallsTopFive = () => {
-  const [lookback, setLookback] = useState<number>(25);
+  const [lookback, setLookback] = useState<number>(400);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookback(Number(e.target.value));
@@ -80,32 +80,39 @@ const PutWallsTopFive = () => {
             wall;
           return (
             <Col xs={12} key={index} className="d-flex">
-              <Card className="border-0 shadow-sm bg-body-emphasis d-flex flex-column h-100 w-100">
-                <Card.Header className="bg-transparent border-0 pb-0 d-flex align-items-center gap-2">
-                  <span
-                    className="text-danger"
-                    aria-hidden="true"
-                    style={{ fontSize: "1.25rem" }}
-                  >
-                    🛡️
-                  </span>
-                  <span className="fw-semibold">{title}</span>
+              <Card
+                className="border-0 shadow-sm bg-body-emphasis d-flex flex-column h-100 w-100"
+                style={{ background: "transparent" }}
+              >
+                <Card.Header className="bg-transparent border-0 pb-0">
+                  <div className="d-flex align-items-center justify-content-end w-100">
+                    <Form.Group className="mb-0" style={{ maxWidth: 220 }}>
+                      <Form.Select
+                        value={lookback}
+                        onChange={handleChange}
+                        aria-label="Select lookback period"
+                        size="sm"
+                        style={{
+                          color: "#fff",
+                          fontWeight: 700,
+                          background: "#111",
+                          border: "1px solid #b39ddb",
+                          borderRadius: "6px",
+                          boxShadow: "0 1px 4px rgba(111,66,193,0.08)",
+                          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
+                        }}
+                      >
+                        <option value={25}>25 Days</option>
+                        <option value={50}>50 Days</option>
+                        <option value={100}>100 Days</option>
+                        <option value={200}>200 Days</option>
+                        <option value={400}>400 Days</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </div>
                 </Card.Header>
-                <Card.Body>
-                  <Form.Group as={Col} md="6" className="mb-4">
-                    <Form.Label>Lookback Period</Form.Label>
-                    <Form.Select
-                      value={lookback}
-                      onChange={handleChange}
-                      aria-label="Select lookback period"
-                    >
-                      <option value={25}>25 Days</option>
-                      <option value={50}>50 Days</option>
-                      <option value={100}>100 Days</option>
-                      <option value={200}>200 Days</option>
-                    </Form.Select>
-                  </Form.Group>
-                  <Row className="g-3">
+                <Card.Body style={{ background: "transparent" }}>
+                  <Row className="g-3" style={{ background: "transparent" }}>
                     <Col xs={12}>
                       <WallChart
                         lookback={lookback}

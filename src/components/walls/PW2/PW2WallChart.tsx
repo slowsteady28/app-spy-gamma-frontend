@@ -7,6 +7,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Brush,
 } from "recharts";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -24,6 +25,7 @@ type PutWallChartProps = {
 type PW2DataPoint = {
   date: string;
   pw2: number;
+  price: number; // <-- Add price to the data type
 };
 
 function PW2WallChart({
@@ -34,44 +36,100 @@ function PW2WallChart({
   setActiveIndex,
 }: PutWallChartProps) {
   const [data, setData] = useState<PW2DataPoint[]>([]);
+  const lineColor = "#6f42c1"; // Purple for Put Wall
+  const priceColor = "#6c757d"; // Price line color
 
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/pw2-history?lookback=${lookback}`)
       .then((res) => {
-        console.log("Put Wall Chart Data:", res.data);
         setData(res.data);
       })
       .catch((err) => console.error("Error loading PW2 data", err));
   }, [lookback]);
 
-  const minPW2 = Math.min(...data.map((d) => d.pw2));
-  const maxPW2 = Math.max(...data.map((d) => d.pw2));
+  const minPW2 = Math.min(...data.map((d) => d.pw2)) - 5;
+  const maxPW2 = Math.max(...data.map((d) => d.pw2)) + 5;
 
   return (
-    <div className="my-4">
-      <h4>Put Wall</h4>
-      <ResponsiveContainer width="100%" height={300}>
+    <div
+      className="my-1"
+      style={{
+        background: "linear-gradient(90deg, #f8f9fa 60%, #ede7f6 100%)", // Light background with a purple tint
+        borderRadius: "12px",
+        boxShadow: "0 2px 12px 0 rgba(111,66,193,0.07)",
+        padding: "1.5rem 1rem",
+      }}
+    >
+      <h4
+        className="text-uppercase mb-2 mt-1 ps-2"
+        style={{
+          letterSpacing: "0.05em",
+          fontWeight: 900,
+          color: "#6f42c1",
+          fontSize: "1.25rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          textShadow: "0 1px 4px rgba(111,66,193,0.08)",
+          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
+        }}
+      >
+        <span
+          style={{
+            display: "inline-block",
+            background: "linear-gradient(90deg, #6f42c1 60%, #b39ddb 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontWeight: 900,
+            letterSpacing: "0.08em",
+          }}
+        >
+          Put Wall
+        </span>
+      </h4>
+      <ResponsiveContainer width="100%" height={380}>
         <LineChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
+            yAxisId="left"
             domain={[minPW2, maxPW2]}
-            label={{
-              value: "Put Wall (PW2)",
-              angle: -90,
-              position: "insideLeft",
-            }}
+            tickMargin={12}
+            axisLine={{ stroke: "#ccc", strokeWidth: 1 }}
+            tickLine={false}
           />
           <Tooltip
-            cursor={{ stroke: "orange", strokeWidth: 2, opacity: 0.7 }}
+            cursor={{
+              stroke: lineColor,
+              strokeWidth: 2,
+              opacity: 0.7,
+            }}
           />
           <Line
+            yAxisId="left"
             type="monotone"
             dataKey="pw2"
-            stroke="purple"
+            stroke={lineColor}
             name="PW2"
+            strokeWidth={3}
+            dot={{ r: 3, stroke: lineColor, fill: "#fff" }}
+            activeDot={{ r: 5, stroke: lineColor, fill: "#fff" }}
+          />
+          <Line
+            yAxisId="left"
+            type="monotone"
+            dataKey="price"
+            stroke={priceColor}
+            name="Price"
             strokeWidth={2}
-            activeDot={{ r: 6 }}
+            dot={false}
+            activeDot={false}
+          />
+          <Brush
+            dataKey="date"
+            height={24}
+            stroke={lineColor}
+            travellerWidth={8}
           />
         </LineChart>
       </ResponsiveContainer>

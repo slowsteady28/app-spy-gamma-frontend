@@ -9,11 +9,9 @@ import {
   BarChart,
 } from "recharts";
 
-////////////////////////////////////////////////////////////////////////////////
-// Ensure you have the correct API base URL set in your environment variables
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-type CallNetGammaChartProps = {
+type PutNetGammaChartProps = {
   lookback: number;
 };
 
@@ -22,42 +20,62 @@ type NetGammaDataPoint = {
   gamma: number;
 };
 
-function CW5NetGammaChart({ lookback }: CallNetGammaChartProps) {
+function CW5NetGammaChart({ lookback }: PutNetGammaChartProps) {
   const [data, setData] = useState<NetGammaDataPoint[]>([]);
 
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/cw5-net-gamma?lookback=${lookback}`)
       .then((res) => {
-        // Scale gamma by 10,000 for readability
-        const transformed = res.data.map((d: NetGammaDataPoint) => ({
-          ...d,
-          gamma: d.gamma / 10000,
-        }));
-        setData(transformed);
+        console.log("cW5 Net Gamma Data:", res.data);
+        setData(res.data);
       })
-      .catch((err) => console.error("Error loading Net Gamma data", err));
+      .catch((err) => console.error("Error loading cW5 net gamma data", err));
   }, [lookback]);
 
-  const minGamma = Math.round(Math.min(...data.map((d) => d.gamma ?? 0)));
-  const maxGamma = Math.round(Math.max(...data.map((d) => d.gamma ?? 0)));
+  const minGamma = Math.min(...data.map((d) => d.gamma ?? 0));
+  const maxGamma = Math.max(...data.map((d) => d.gamma ?? 0));
 
-  // Custom tooltip formatter for commas
-  const tooltipFormatter = (value: number) =>
-    value?.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const mainColor = "#0096b4"; // Updated from purple to teal
 
   return (
-    <div className="my-1">
+    <div
+      className="my-1"
+      style={{
+        background: "linear-gradient(90deg, #f8f9fa 60%, #d0f0f7 100%)", // ✅ Teal background
+        borderRadius: "12px",
+        boxShadow: "0 2px 12px 0 rgba(0,150,180,0.07)", // ✅ Teal shadow
+        padding: "1.5rem 1rem",
+      }}
+    >
       <h4
-        className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
+        className="text-uppercase mb-2 mt-1 ps-2"
         style={{
           letterSpacing: "0.05em",
-          fontWeight: 700,
+          fontWeight: 900,
+          color: mainColor,
+          fontSize: "1.25rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          textShadow: "0 1px 4px rgba(0,150,180,0.08)", // ✅ Teal shadow
+          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
         }}
       >
-        Net Call Gamma (in 10,000s)
+        <span
+          style={{
+            display: "inline-block",
+            background: "linear-gradient(90deg, #0096b4 60%, #33cbe0 100%)", // ✅ Teal gradient
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontWeight: 900,
+            letterSpacing: "0.08em",
+          }}
+        >
+          Net Call Gamma
+        </span>
       </h4>
-      <ResponsiveContainer width="100%" height={380}>
+      <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
@@ -70,17 +88,15 @@ function CW5NetGammaChart({ lookback }: CallNetGammaChartProps) {
             tickLine={false}
           />
           <Tooltip
-            cursor={{
-              stroke: "rgb(191, 23, 45)",
-              strokeWidth: 2,
-              opacity: 0.7,
-            }}
-            formatter={tooltipFormatter}
+            cursor={{ stroke: mainColor, strokeWidth: 2, opacity: 0.7 }}
+            formatter={(value: number) =>
+              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
+            }
           />
           <Bar
             dataKey="gamma"
             name="Net Gamma"
-            fill="#0d6efd"
+            fill={mainColor}
             barSize={14}
             opacity={0.8}
           />

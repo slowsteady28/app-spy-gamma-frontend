@@ -191,9 +191,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                     href="/cw-top-5"
                     style={{
                       fontSize: "0.85rem",
-                      color: isActive("/cw-top-5")
-                        ? "rgb(191, 23, 45)"
-                        : "#212529", // <-- Updated color
+                      color: isActive("/cw-top-5") ? "#0096b4" : "#212529", // <-- Updated color
                       backgroundColor: "transparent",
                       borderRadius: "5px",
                       padding: "0.5rem 1.5rem",
@@ -212,7 +210,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         style={{
                           fontSize: "0.85rem",
                           color: isActive(href)
-                            ? "rgb(191, 23, 45)" // <-- Active link color for Call Walls
+                            ? "#0096b4" // <-- Active link color for Call Walls
                             : "#212529",
                           backgroundColor: "transparent",
                           borderRadius: "5px",
@@ -344,7 +342,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                     style={{
                       fontSize: "0.85rem",
                       color: isActive("/abs-gamma-top-3")
-                        ? "#0d6efd"
+                        ? "#8B0000"
                         : "#212529",
                       backgroundColor: "transparent",
                       borderRadius: "5px",
@@ -363,7 +361,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         href={href}
                         style={{
                           fontSize: "0.85rem",
-                          color: isActive(href) ? "#0d6efd" : "#212529",
+                          color: isActive(href) ? "#8B0000" : "#212529",
                           backgroundColor: "transparent",
                           borderRadius: "5px",
                           padding: "0.5rem 1.5rem",
@@ -394,7 +392,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           </li>
           <li className="nav-item">
             <a
-              href="/scribble"
+              href="/commentary"
               className="nav-link ps-0"
               tabIndex={collapsed ? -1 : 0}
             >
@@ -413,7 +411,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                 <i className="bi bi-pencil-square me-2"></i>
                 {!collapsed && (
                   <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
-                    Scribble
+                    Coming Soon
                   </span>
                 )}
               </div>

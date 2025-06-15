@@ -10,7 +10,6 @@ import {
   Brush,
 } from "recharts";
 
-////////////////////////////////////////////////////////////////////////////////
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 type CallWallChartProps = {
@@ -21,7 +20,7 @@ type CallWallChartProps = {
   setActiveIndex: (index: number | null) => void;
 };
 
-type CW5DataPoint = {
+type cW5DataPoint = {
   date: string;
   cw5: number;
   price: number;
@@ -34,46 +33,70 @@ function CW5WallChart({
   activeIndex,
   setActiveIndex,
 }: CallWallChartProps) {
-  const [data, setData] = useState<CW5DataPoint[]>([]);
-  const lineColor = "#0d6efd";
+  const [data, setData] = useState<cW5DataPoint[]>([]);
+  const lineColor = "#0096b4"; // 🔵 Replaced from purple
   const priceColor = "#6c757d";
 
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/cw5-history?lookback=${lookback}`)
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((err) => console.error("Error loading CW5 data", err));
+      .then((res) => setData(res.data))
+      .catch((err) => console.error("Error loading cW5 data", err));
   }, [lookback]);
 
-  const minCW5 = Math.min(...data.map((d) => d.cw5)) - 5;
-  const maxCW5 = Math.max(...data.map((d) => d.cw5)) + 5;
+  const mincW5 = Math.min(...data.map((d) => d.cw5)) - 5;
+  const maxcW5 = Math.max(...data.map((d) => d.cw5)) + 5;
 
   return (
-    <div className="my-1">
+    <div
+      className="my-1"
+      style={{
+        background: "linear-gradient(90deg, #f8f9fa 60%, #d0f0f7 100%)", // 💠 teal-tinted background
+        borderRadius: "12px",
+        boxShadow: "0 2px 12px 0 rgba(0,150,180,0.07)", // 🟦 teal shadow
+        padding: "1.5rem 1rem",
+      }}
+    >
       <h4
-        className="text-uppercase text-secondary small mb-2 mt-3 ps-2"
+        className="text-uppercase mb-2 mt-1 ps-2"
         style={{
           letterSpacing: "0.05em",
-          fontWeight: 700,
+          fontWeight: 900,
+          color: lineColor,
+          fontSize: "1.25rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          textShadow: "0 1px 4px rgba(0,150,180,0.08)",
+          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
         }}
       >
-        Call Wall
+        <span
+          style={{
+            display: "inline-block",
+            background: "linear-gradient(90deg, #0096b4 60%, #33cbe0 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontWeight: 900,
+            letterSpacing: "0.08em",
+          }}
+        >
+          Call Wall
+        </span>
       </h4>
       <ResponsiveContainer width="100%" height={380}>
         <LineChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
           <YAxis
             yAxisId="left"
-            domain={[minCW5, maxCW5]}
+            domain={[mincW5, maxcW5]}
             tickMargin={12}
             axisLine={{ stroke: "#ccc", strokeWidth: 1 }}
             tickLine={false}
           />
           <Tooltip
             cursor={{
-              stroke: "rgb(191, 23, 45)",
+              stroke: lineColor,
               strokeWidth: 2,
               opacity: 0.7,
             }}
@@ -82,11 +105,11 @@ function CW5WallChart({
             yAxisId="left"
             type="monotone"
             dataKey="cw5"
-            stroke="rgb(191, 23, 45)"
-            name="CW5"
+            stroke={lineColor}
+            name="cW5"
             strokeWidth={3}
-            dot={{ r: 3, stroke: "rgb(191, 23, 45)", fill: "#fff" }}
-            activeDot={{ r: 5, stroke: "rgb(191, 23, 45)", fill: "#fff" }}
+            dot={{ r: 3, stroke: lineColor, fill: "#fff" }}
+            activeDot={{ r: 5, stroke: lineColor, fill: "#fff" }}
           />
           <Line
             yAxisId="left"
@@ -101,7 +124,7 @@ function CW5WallChart({
           <Brush
             dataKey="date"
             height={24}
-            stroke="rgb(191, 23, 45)"
+            stroke={lineColor}
             travellerWidth={8}
           />
         </LineChart>

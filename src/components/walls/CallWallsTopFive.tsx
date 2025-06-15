@@ -80,30 +80,27 @@ const CallWallsTopFive = () => {
             wall;
           return (
             <Col xs={12} key={index} className="d-flex">
-              <Card className="border-0 shadow-sm bg-body-emphasis d-flex flex-column h-100 w-100">
-                <Card.Header className="bg-transparent border-0 pb-0 d-flex align-items-center">
-                  <span
-                    className="text-primary"
-                    aria-hidden="true"
-                    style={{ fontSize: "1.25rem" }}
-                  >
-                    📈
-                  </span>
-                  <span className="fw-semibold ms-2">{title}</span>
-                  <div className="ms-auto d-flex align-items-center">
-                    <div className="d-flex flex-column align-items-end">
-                      <span
-                        className="text-secondary small fw-bold mb-1"
-                        style={{ letterSpacing: "0.02em" }}
-                      >
-                        Lookback Period
-                      </span>
+              <Card
+                className="border-0 shadow-sm bg-body-emphasis d-flex flex-column h-100 w-100"
+                style={{ background: "transparent" }}
+              >
+                <Card.Header className="bg-transparent border-0 pb-0">
+                  <div className="d-flex align-items-center justify-content-end w-100">
+                    <Form.Group className="mb-0" style={{ maxWidth: 220 }}>
                       <Form.Select
                         value={lookback}
                         onChange={handleChange}
                         aria-label="Select lookback period"
                         size="sm"
-                        style={{ minWidth: 120 }}
+                        style={{
+                          color: "#fff",
+                          fontWeight: 700,
+                          background: "#111",
+                          border: "1px solid #b39ddb",
+                          borderRadius: "6px",
+                          boxShadow: "0 1px 4px rgba(111,66,193,0.08)",
+                          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
+                        }}
                       >
                         <option value={25}>25 Days</option>
                         <option value={50}>50 Days</option>
@@ -111,11 +108,11 @@ const CallWallsTopFive = () => {
                         <option value={200}>200 Days</option>
                         <option value={400}>400 Days</option>
                       </Form.Select>
-                    </div>
+                    </Form.Group>
                   </div>
                 </Card.Header>
-                <Card.Body>
-                  <Row className="g-3">
+                <Card.Body style={{ background: "transparent" }}>
+                  <Row className="g-3" style={{ background: "transparent" }}>
                     <Col xs={12}>
                       <WallChart
                         lookback={lookback}
