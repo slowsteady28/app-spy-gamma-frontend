@@ -382,6 +382,54 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             )}
           </li>
 
+          {/* REGIME SHIFT */}
+          <li className="nav-item mt-3">
+            <div
+              style={{
+                cursor: "pointer",
+                padding: "0.5rem 1.5rem",
+                backgroundColor: "#212529",
+                borderRadius: "5px",
+                color: "#fff",
+              }}
+              className={`d-flex align-items-center ${
+                collapsed ? "justify-content-center" : ""
+              }`}
+              onClick={() => {}} // No submenu, so no toggle needed
+            >
+              <i className="bi bi-lightning-charge me-2"></i>
+              {!collapsed && (
+                <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                  REGIME SHIFT
+                </span>
+              )}
+            </div>
+            {!collapsed && (
+              <ul
+                className="nav flex-column"
+                style={{ marginLeft: "1.5rem", paddingLeft: "0.5rem" }}
+              >
+                <li className="nav-item">
+                  <a
+                    className={`nav-link${
+                      isActive("/gamma-flip") ? " active" : ""
+                    }`}
+                    href="/gamma-flip"
+                    style={{
+                      fontSize: "0.85rem",
+                      color: isActive("/gamma-flip") ? "#0096b4" : "#212529",
+                      backgroundColor: "transparent",
+                      borderRadius: "5px",
+                      padding: "0.5rem 1.5rem",
+                    }}
+                  >
+                    Gamma Flip
+                  </a>
+                </li>
+              </ul>
+            )}
+          </li>
+
           {/* Analytics Section */}
           <li
             className={`nav-item text-uppercase text-secondary small mb-2 mt-4 ps-2 ${

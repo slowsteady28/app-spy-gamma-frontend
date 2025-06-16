@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import MainLayout from "../layouts/MainLayout";
 
+import MarketCommentary from "./MarketCommentary";
+
 import CallWallsTopFive from "../components/walls/CallWallsTopFive";
 import CW1AppReady from "../components/walls/CW1/CW1AppReady";
 import CW2AppReady from "../components/walls/CW2/CW2AppReady";
@@ -21,7 +23,7 @@ import AGS1AppReady from "../components/walls/AG1/AGS1AppReady";
 import AGS2AppReady from "../components/walls/AG2/AGS2AppReady";
 import AGS3AppReady from "../components/walls/AG3/AGS3AppReady";
 
-import MarketCommentary from "./MarketCommentary";
+import GammaFlip from "../components/RegimeChange/GammaFlip";
 
 function Dashboard() {
   const CallWalls = [
@@ -87,6 +89,7 @@ function Dashboard() {
       <MainLayout>
         <Routes>
           <Route path="/" element={<CallWallsTopFive />} />
+          <Route path="/commentary" element={<MarketCommentary />} />
           <Route path="/cw-top-5" element={<CallWallsTopFive />} />
           {CallWalls.map((Wall, index) => {
             const { path, CallWall } = Wall;
@@ -102,7 +105,7 @@ function Dashboard() {
             const { path, ABSWall } = Wall;
             return <Route key={index} path={path} element={<ABSWall />} />;
           })}
-          <Route path="/commentary" element={<MarketCommentary />} />
+          <Route path="/gamma-flip" element={<GammaFlip />} />
         </Routes>
       </MainLayout>
     </Router>
