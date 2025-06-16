@@ -17,6 +17,7 @@ export default function MarketCommentary() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const [showTopBtn, setShowTopBtn] = useState(false);
+  const [fullscreenIdx, setFullscreenIdx] = useState<number | null>(null); // <-- Add this line
 
   // Fetch logic as a function
   const fetchCommentary = () => {
@@ -118,7 +119,7 @@ export default function MarketCommentary() {
             </div>
           </div>
         ) : (
-          data.map((entry) => (
+          data.map((entry, idx) => (
             <div
               className="col-12 col-sm-12 col-md-6 col-xl-6 d-flex"
               key={entry.date}
@@ -126,6 +127,9 @@ export default function MarketCommentary() {
               <MarketCommentaryCard
                 date={entry.date}
                 markdown={entry.markdown}
+                isFullscreen={fullscreenIdx === idx}
+                onFullscreen={() => setFullscreenIdx(idx)}
+                onExitFullscreen={() => setFullscreenIdx(null)}
               />
             </div>
           ))
