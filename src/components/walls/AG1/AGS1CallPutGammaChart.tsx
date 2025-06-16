@@ -9,10 +9,13 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Button from "react-bootstrap/Button";
 
 const mainColor = "#212529"; // Dark Bootstrap Gray
 const accentColor = "#495057"; // Slightly lighter gray
 const deepRed = "#8B0000"; // Deep Red for Put Gamma
+const callGray = "#343a40"; // Dark Gray for Call Gamma
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -28,6 +31,7 @@ type Props = {
 
 function AbsGamma1CallPutGammaChart({ lookback }: Props) {
   const [data, setData] = useState<GammaDataPoint[]>([]);
+  const [visible, setVisible] = useState<"both" | "call" | "put">("both");
 
   useEffect(() => {
     axios
@@ -56,33 +60,58 @@ function AbsGamma1CallPutGammaChart({ lookback }: Props) {
         padding: "1.5rem 1rem",
       }}
     >
-      <h4
-        className="text-uppercase mb-2 mt-1 ps-2"
-        style={{
-          letterSpacing: "0.05em",
-          fontWeight: 900,
-          color: mainColor,
-          fontSize: "1.25rem",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          textShadow: "0 1px 4px rgba(33, 37, 41, 0.15)",
-          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
-        }}
-      >
-        <span
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <h4
+          className="text-uppercase mb-0 ps-2"
           style={{
-            display: "inline-block",
-            background: "linear-gradient(90deg, #212529, #868e96)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            letterSpacing: "0.05em",
             fontWeight: 900,
-            letterSpacing: "0.08em",
+            color: mainColor,
+            fontSize: "1.25rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            textShadow: "0 1px 4px rgba(33, 37, 41, 0.15)",
+            fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
           }}
         >
-          Call & Put Gamma
-        </span>
-      </h4>
+          <span
+            style={{
+              display: "inline-block",
+              background: "linear-gradient(90deg, #212529, #868e96)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontWeight: 900,
+              letterSpacing: "0.08em",
+            }}
+          >
+            Call & Put Gamma
+          </span>
+        </h4>
+        <ButtonGroup>
+          <Button
+            variant={visible === "both" ? "dark" : "outline-dark"}
+            size="sm"
+            onClick={() => setVisible("both")}
+          >
+            Both
+          </Button>
+          <Button
+            variant={visible === "call" ? "dark" : "outline-dark"}
+            size="sm"
+            onClick={() => setVisible("call")}
+          >
+            Call Gamma
+          </Button>
+          <Button
+            variant={visible === "put" ? "dark" : "outline-dark"}
+            size="sm"
+            onClick={() => setVisible("put")}
+          >
+            Put Gamma
+          </Button>
+        </ButtonGroup>
+      </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
@@ -94,18 +123,22 @@ function AbsGamma1CallPutGammaChart({ lookback }: Props) {
             }
           />
           <Legend />
-          <Bar
-            dataKey="call_gamma"
-            name="Call Gamma"
-            fill="#343a40"
-            radius={[4, 4, 0, 0]}
-          />
-          <Bar
-            dataKey="put_gamma"
-            name="Put Gamma"
-            fill={deepRed}
-            radius={[4, 4, 0, 0]}
-          />
+          {(visible === "both" || visible === "call") && (
+            <Bar
+              dataKey="call_gamma"
+              name="Call Gamma"
+              fill={callGray}
+              radius={[4, 4, 0, 0]}
+            />
+          )}
+          {(visible === "both" || visible === "put") && (
+            <Bar
+              dataKey="put_gamma"
+              name="Put Gamma"
+              fill={deepRed}
+              radius={[4, 4, 0, 0]}
+            />
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
