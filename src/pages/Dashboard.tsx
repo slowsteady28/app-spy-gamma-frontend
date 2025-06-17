@@ -25,6 +25,9 @@ import AGS3AppReady from "../components/walls/AG3/AGS3AppReady";
 
 import GammaFlip from "../components/RegimeChange/GammaFlip";
 
+import About from "./About";
+import Contact from "./Contact";
+
 function Dashboard() {
   const CallWalls = [
     {
@@ -106,6 +109,8 @@ function Dashboard() {
             return <Route key={index} path={path} element={<ABSWall />} />;
           })}
           <Route path="/gamma-flip" element={<GammaFlip />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </MainLayout>
     </Router>

@@ -9,13 +9,15 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Button from "react-bootstrap/Button";
+
+const mainColor = "#212529";
+const accentColor = "#495057";
+const deepRed = "#8B0000";
+const callGray = "#343a40";
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-
-const mainColor = "#212529"; // Dark Bootstrap Gray
-const accentColor = "#495057"; // Slightly lighter gray
-const deepRed = "#8B0000"; // Deep Red for Put bars
-const callGray = "#343a40"; // Dark Gray for Call bars
 
 type DurationDataPoint = {
   date: string;
@@ -27,22 +29,26 @@ type Props = {
   lookback: number;
 };
 
-function AbsGamma2DurationChart({ lookback }: Props) {
+function AGS2DurationChart({ lookback }: Props) {
   const [data, setData] = useState<DurationDataPoint[]>([]);
+  const [visible, setVisible] = useState<"both" | "call" | "put">("both");
 
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/ags2-duration?lookback=${lookback}`)
       .then((res) => {
-        console.log("AbsGamma2 Duration Data:", res.data);
-        setData(res.data);
+        // Check if your API returns { data: [...] } or just [...]
+        const arr = Array.isArray(res.data) ? res.data : res.data.data;
+        setData(arr);
       })
-      .catch((err) => console.error("Error loading AGS1 Duration", err));
+      .catch((err) => console.error("Error loading AGS2 Duration data", err));
   }, [lookback]);
 
-  const durations = data.flatMap((d) => [d.call_duration, d.put_duration]);
-  const min = Math.min(...durations);
-  const max = Math.max(...durations);
+  // Add this for debugging
+  console.log("Duration data:", data);
+
+  const tooltipFormatter = (value: number) =>
+    value?.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
   return (
     <div
@@ -54,60 +60,87 @@ function AbsGamma2DurationChart({ lookback }: Props) {
         padding: "1.5rem 1rem",
       }}
     >
-      <h4
-        className="text-uppercase mb-2 mt-1 ps-2"
-        style={{
-          letterSpacing: "0.05em",
-          fontWeight: 900,
-          color: mainColor,
-          fontSize: "1.25rem",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          textShadow: "0 1px 4px rgba(33, 37, 41, 0.15)",
-          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
-        }}
-      >
-        <span
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <h4
+          className="text-uppercase mb-0 ps-2"
           style={{
-            display: "inline-block",
-            background: "linear-gradient(90deg, #212529, #868e96)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            letterSpacing: "0.05em",
             fontWeight: 900,
-            letterSpacing: "0.08em",
+            color: mainColor,
+            fontSize: "1.25rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            textShadow: "0 1px 4px rgba(33, 37, 41, 0.15)",
+            fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
           }}
         >
-          Avg Duration (Calls vs Puts)
-        </span>
-      </h4>
+          <span
+            style={{
+              display: "inline-block",
+              background: "linear-gradient(90deg, #212529, #868e96)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontWeight: 900,
+              letterSpacing: "0.08em",
+            }}
+          >
+            Call & Put Duration
+          </span>
+        </h4>
+        <ButtonGroup>
+          <Button
+            variant={visible === "both" ? "dark" : "outline-dark"}
+            size="sm"
+            onClick={() => setVisible("both")}
+          >
+            Both
+          </Button>
+          <Button
+            variant={visible === "call" ? "dark" : "outline-dark"}
+            size="sm"
+            onClick={() => setVisible("call")}
+          >
+            Call Duration
+          </Button>
+          <Button
+            variant={visible === "put" ? "dark" : "outline-dark"}
+            size="sm"
+            onClick={() => setVisible("put")}
+          >
+            Put Duration
+          </Button>
+        </ButtonGroup>
+      </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} syncId="spy-sync">
           <XAxis dataKey="date" />
-          <YAxis domain={[min - 1, max + 1]} />
+          <YAxis />
           <Tooltip
-            cursor={{ stroke: accentColor, strokeWidth: 2, opacity: 0.7 }}
-            formatter={(value: number) =>
-              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
-            }
+            cursor={{ stroke: accentColor, strokeWidth: 2, opacity: 0.5 }}
+            formatter={tooltipFormatter}
           />
           <Legend />
-          <Bar
-            dataKey="call_duration"
-            name="Call Duration"
-            fill={callGray}
-            radius={[4, 4, 0, 0]}
-          />
-          <Bar
-            dataKey="put_duration"
-            name="Put Duration"
-            fill={deepRed}
-            radius={[4, 4, 0, 0]}
-          />
+          {(visible === "both" || visible === "call") && (
+            <Bar
+              dataKey="call_duration"
+              name="Call Duration"
+              fill={callGray}
+              radius={[4, 4, 0, 0]}
+            />
+          )}
+          {(visible === "both" || visible === "put") && (
+            <Bar
+              dataKey="put_duration"
+              name="Put Duration"
+              fill={deepRed}
+              radius={[4, 4, 0, 0]}
+            />
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
-export default AbsGamma2DurationChart;
+export default AGS2DurationChart;

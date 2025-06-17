@@ -14,6 +14,8 @@ import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Button from "react-bootstrap/Button";
 
 // API base URL
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
@@ -22,14 +24,40 @@ type GammaFlipDataPoint = {
   date: string;
   price: number;
   gamma_flip: number;
+  vix: number;
+  call_wall: number;
+  put_wall: number;
+  abs_gamma: number;
 };
 
-const mainColor = "#0096b4"; // Teal for regime shift
-const priceColor = "#ff9800"; // Orange for price
+// Optimized color scheme for high contrast and clarity
+const mainColor = "#0096b4"; // Gamma Flip - Teal
+const priceColor = "#d7263d"; // Price - Vivid Red
+const vixColor = "#7c3aed"; // VIX - Vivid Purple
+const callWallColor = "#fbbf24"; // Call Wall - Amber/Gold
+const putWallColor = "#10b981"; // Put Wall - Emerald Green
+const absGammaColor = "#6366f1"; // Abs Gamma - Indigo
+
+const lineOptions = [
+  { key: "gamma_flip", label: "Gamma Flip", color: mainColor },
+  { key: "price", label: "Price", color: priceColor },
+  { key: "call_wall", label: "Call Wall", color: callWallColor },
+  { key: "put_wall", label: "Put Wall", color: putWallColor },
+  { key: "abs_gamma", label: "Abs Gamma", color: absGammaColor },
+  { key: "vix", label: "Vix", color: vixColor },
+];
 
 const GammaFlip = () => {
   const [lookback, setLookback] = useState<number>(400);
   const [data, setData] = useState<GammaFlipDataPoint[]>([]);
+  const [visibleLines, setVisibleLines] = useState<string[]>([
+    "gamma_flip",
+    "price",
+    "call_wall",
+    "put_wall",
+    "abs_gamma",
+    "vix",
+  ]);
 
   useEffect(() => {
     axios
@@ -41,8 +69,21 @@ const GammaFlip = () => {
   const minGammaFlip = Math.min(...data.map((d) => d.gamma_flip));
   const maxGammaFlip = Math.max(...data.map((d) => d.gamma_flip));
 
+  // Calculate min/max for Vix for right Y axis
+  const vixValues = data
+    .map((d) => d.vix)
+    .filter((v) => typeof v === "number" && !isNaN(v));
+  const minVix = vixValues.length ? Math.min(...vixValues) : 0;
+  const maxVix = vixValues.length ? Math.max(...vixValues) : 100;
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookback(Number(e.target.value));
+  };
+
+  const toggleLine = (key: string) => {
+    setVisibleLines((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
   };
 
   return (
@@ -52,6 +93,7 @@ const GammaFlip = () => {
         borderRadius: "16px",
         boxShadow: "0 4px 24px rgba(0, 150, 180, 0.08)",
         marginBottom: "24px",
+        marginTop: "10.5rem", // Add this line to push the card down
       }}
     >
       <Card.Header
@@ -65,26 +107,46 @@ const GammaFlip = () => {
           borderBottom: "none",
         }}
       >
-        Gamma Flip
-      </Card.Header>
-      <Card.Body style={{ background: "transparent" }}>
-        <Row className="mb-3">
-          <Col xs={12} md={4} lg={3}>
-            <Form.Group>
-              <Form.Label style={{ color: mainColor, fontWeight: 600 }}>
-                Lookback Period
-              </Form.Label>
+        <div className="d-flex justify-content-between align-items-center flex-wrap">
+          <span>Gamma Flip</span>
+          <div className="d-flex align-items-center gap-2 flex-wrap">
+            <ButtonGroup className="me-2">
+              {lineOptions.map((opt) => (
+                <Button
+                  key={opt.key}
+                  variant={
+                    visibleLines.includes(opt.key) ? "dark" : "outline-dark"
+                  }
+                  size="sm"
+                  style={{
+                    fontWeight: 500,
+                    color: visibleLines.includes(opt.key) ? "#fff" : opt.color,
+                    borderColor: opt.color,
+                    background: visibleLines.includes(opt.key)
+                      ? opt.color
+                      : "#fff",
+                  }}
+                  onClick={() => toggleLine(opt.key)}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </ButtonGroup>
+            <Form.Group className="mb-0" style={{ minWidth: 200 }}>
               <Form.Select
                 value={lookback}
                 onChange={handleChange}
                 aria-label="Select lookback period"
                 style={{
-                  width: "200px",
+                  width: "160px",
                   background: "#fff",
                   border: `1px solid ${mainColor}`,
                   color: mainColor,
                   fontWeight: "bold",
+                  fontSize: "0.98rem",
+                  marginLeft: "auto",
                 }}
+                size="sm"
               >
                 <option value={25}>25 Days</option>
                 <option value={50}>50 Days</option>
@@ -93,12 +155,16 @@ const GammaFlip = () => {
                 <option value={400}>400 Days</option>
               </Form.Select>
             </Form.Group>
-          </Col>
-        </Row>
-        <ResponsiveContainer width="100%" height={350}>
+          </div>
+        </div>
+      </Card.Header>
+      <Card.Body style={{ background: "transparent" }}>
+        <ResponsiveContainer width="100%" height={1200}>
           <LineChart data={data}>
             <XAxis dataKey="date" />
+            {/* Left Y Axis for Gamma Flip, Price, Call Wall, Put Wall, Abs Gamma */}
             <YAxis
+              yAxisId="left"
               domain={[
                 (dataMin: number) => dataMin - 5,
                 (dataMax: number) => dataMax + 5,
@@ -110,29 +176,95 @@ const GammaFlip = () => {
                 fill: mainColor,
               }}
             />
+            {/* Right Y Axis for Vix */}
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              domain={[minVix - 5, maxVix + 5]}
+              tick={{ fill: vixColor }}
+              label={{
+                angle: 90,
+                position: "insideRight",
+                fill: vixColor,
+                fontSize: 12,
+              }}
+            />
             <Tooltip
               contentStyle={{ background: "#e0f7fa", borderColor: mainColor }}
               labelStyle={{ color: mainColor }}
             />
             <Legend />
-            <Line
-              type="monotone"
-              dataKey="gamma_flip"
-              stroke={mainColor}
-              strokeWidth={3}
-              dot={false}
-              name="Gamma Flip"
-            />
-            <Line
-              type="monotone"
-              dataKey="price"
-              stroke={priceColor}
-              strokeWidth={2}
-              dot={false}
-              name="Price"
-              yAxisId={0}
-              connectNulls
-            />
+            {visibleLines.includes("gamma_flip") && (
+              <Line
+                type="monotone"
+                dataKey="gamma_flip"
+                stroke={mainColor}
+                strokeWidth={3}
+                dot={false}
+                name="Gamma Flip"
+                yAxisId="left"
+              />
+            )}
+            {visibleLines.includes("price") && (
+              <Line
+                type="monotone"
+                dataKey="price"
+                stroke={priceColor}
+                strokeWidth={2}
+                dot={false}
+                name="Price"
+                yAxisId="left"
+                connectNulls
+              />
+            )}
+            {visibleLines.includes("call_wall") && (
+              <Line
+                type="monotone"
+                dataKey="call_wall"
+                stroke={callWallColor}
+                strokeWidth={2}
+                dot={false}
+                name="Call Wall"
+                yAxisId="left"
+                connectNulls
+              />
+            )}
+            {visibleLines.includes("put_wall") && (
+              <Line
+                type="monotone"
+                dataKey="put_wall"
+                stroke={putWallColor}
+                strokeWidth={2}
+                dot={false}
+                name="Put Wall"
+                yAxisId="left"
+                connectNulls
+              />
+            )}
+            {visibleLines.includes("abs_gamma") && (
+              <Line
+                type="monotone"
+                dataKey="abs_gamma"
+                stroke={absGammaColor}
+                strokeWidth={2}
+                dot={false}
+                name="Abs Gamma"
+                yAxisId="left"
+                connectNulls
+              />
+            )}
+            {visibleLines.includes("vix") && (
+              <Line
+                type="monotone"
+                dataKey="vix"
+                stroke={vixColor}
+                strokeWidth={2}
+                dot={false}
+                name="Vix"
+                yAxisId="right"
+                connectNulls
+              />
+            )}
             <Brush
               dataKey="date"
               height={24}

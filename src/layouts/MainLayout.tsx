@@ -40,6 +40,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           zIndex: 1040,
           transition: "width 0.2s cubic-bezier(.4,0,.2,1)",
           boxShadow: "0 0 16px 0 rgba(0,0,0,0.07)",
+          overflowY: "auto", // <-- Add this line
         }}
       >
         {/* Collapse Button */}
@@ -111,7 +112,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         />
 
         {/* Navigation with Section Headings */}
-        <ul className="nav flex-column sidebar-nav">
+        <ul
+          className="nav flex-column sidebar-nav"
+          style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+        >
           {/* Navigation Section */}
           <li
             className={`nav-item text-uppercase text-secondary small mb-2 mt-3 ps-2 ${
@@ -464,6 +468,102 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                 )}
               </div>
             </a>
+          </li>
+
+          {/* COMPANY Section */}
+          <li
+            className={`nav-item text-uppercase text-secondary small mb-2 mt-4 ps-2 ${
+              collapsed ? "d-none" : ""
+            }`}
+          >
+            Company
+          </li>
+          <li className="nav-item">
+            <a
+              className={`nav-link${isActive("/about") ? " active" : ""}`}
+              href="/about"
+              style={{
+                fontSize: "0.9rem",
+                color: isActive("/about") ? "#0096b4" : "#212529",
+                backgroundColor: isActive("/about") ? "#e0f7fa" : "transparent",
+                borderRadius: "5px",
+                padding: "0.5rem 1.5rem",
+                fontWeight: 500,
+                letterSpacing: "0.01em",
+                marginBottom: "2px",
+                transition: "background 0.15s, color 0.15s",
+              }}
+            >
+              <i
+                className="bi bi-info-circle me-2"
+                style={{ color: isActive("/about") ? "#0096b4" : "#adb5bd" }}
+              ></i>
+              {!collapsed && "About"}
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              className={`nav-link${isActive("/careers") ? " active" : ""}`}
+              href="/careers"
+              style={{
+                fontSize: "0.9rem",
+                color: isActive("/careers") ? "#0096b4" : "#212529",
+                backgroundColor: isActive("/careers")
+                  ? "#e0f7fa"
+                  : "transparent",
+                borderRadius: "5px",
+                padding: "0.5rem 1.5rem",
+                fontWeight: 500,
+                letterSpacing: "0.01em",
+                marginBottom: "2px",
+                transition: "background 0.15s, color 0.15s",
+              }}
+            >
+              <i
+                className="bi bi-briefcase me-2"
+                style={{ color: isActive("/careers") ? "#0096b4" : "#adb5bd" }}
+              ></i>
+              {!collapsed && "Careers"}
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              className={`nav-link${isActive("/contact") ? " active" : ""}`}
+              href="/contact"
+              style={{
+                fontSize: "0.9rem",
+                color: isActive("/contact") ? "#0096b4" : "#212529",
+                backgroundColor: isActive("/contact")
+                  ? "#e0f7fa"
+                  : "transparent",
+                borderRadius: "5px",
+                padding: "0.5rem 1.5rem",
+                fontWeight: 500,
+                letterSpacing: "0.01em",
+                marginBottom: "2px",
+                transition: "background 0.15s, color 0.15s",
+              }}
+            >
+              <i
+                className="bi bi-envelope me-2"
+                style={{ color: isActive("/contact") ? "#0096b4" : "#adb5bd" }}
+              ></i>
+              {!collapsed && "Contact"}
+            </a>
+          </li>
+          <li>
+            <div
+              style={{
+                borderTop: "1px solid #e9ecef",
+                marginTop: "1.5rem",
+                paddingTop: "1rem",
+                textAlign: "center",
+                fontSize: "0.85rem",
+                color: "#adb5bd",
+              }}
+            >
+              &copy; {new Date().getFullYear()} SPY GAMMA
+            </div>
           </li>
         </ul>
       </div>
