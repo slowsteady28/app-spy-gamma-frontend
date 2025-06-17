@@ -76,6 +76,32 @@ const GammaFlip = () => {
   const minVix = vixValues.length ? Math.min(...vixValues) : 0;
   const maxVix = vixValues.length ? Math.max(...vixValues) : 100;
 
+  // Calculate min/max for all left-axis metrics
+  const leftAxisKeys = [
+    "gamma_flip",
+    "price",
+    "call_wall",
+    "put_wall",
+    "abs_gamma",
+  ];
+  const leftAxisValues = data
+    .flatMap((d) =>
+      leftAxisKeys.map((key) => {
+        const val = d[key as keyof typeof d];
+        return typeof val === "number" && !isNaN(val) ? val : undefined;
+      })
+    )
+    .filter((v): v is number => typeof v === "number" && !isNaN(v));
+
+  // Exclude zeros if you don't want them as min
+  const nonZeroLeftAxisValues = leftAxisValues.filter((v) => v !== 0);
+  const minLeft = nonZeroLeftAxisValues.length
+    ? Math.min(...nonZeroLeftAxisValues)
+    : 0;
+  const maxLeft = leftAxisValues.length ? Math.max(...leftAxisValues) : 100;
+
+  console.log("leftAxisValues:", leftAxisValues, "minLeft:", minLeft); // Debugging line
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookback(Number(e.target.value));
   };
@@ -166,8 +192,12 @@ const GammaFlip = () => {
             <YAxis
               yAxisId="left"
               domain={[
-                (dataMin: number) => dataMin - 5,
-                (dataMax: number) => dataMax + 5,
+                (dataMin: number) => {
+                  // Exclude zeros for min calculation
+                  const filtered = leftAxisValues.filter((v) => v !== 0);
+                  return filtered.length ? Math.min(...filtered) : 0;
+                },
+                (dataMax: number) => maxLeft + 5,
               ]}
               tick={{ fill: mainColor }}
               label={{
