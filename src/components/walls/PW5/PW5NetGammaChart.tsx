@@ -16,8 +16,9 @@ type NetGammaDataPoint = {
 
 function PW5NetGammaChart({ lookback }: PutNetGammaChartProps) {
   const chartRef = useRef<any>(null);
-
-  const { hoveredDate, setHoveredDate } = useChartSync();
+  const chartSyncContext = useChartSync();
+  const hoveredDate = chartSyncContext?.hoveredDate || null;
+  const setHoveredDate = chartSyncContext?.setHoveredDate || (() => {});
   const [data, setData] = useState<NetGammaDataPoint[]>([]);
   const mainColor = "#6F42C1";
 

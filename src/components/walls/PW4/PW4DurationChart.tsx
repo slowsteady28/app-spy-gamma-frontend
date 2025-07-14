@@ -17,7 +17,10 @@ type DurationDataPoint = {
 
 function PW4DurationChart({ lookback }: DurationChartProps) {
   const chartRef = useRef<any>(null);
-  const { hoveredDate, setHoveredDate } = useChartSync();
+  const chartSyncContext = useChartSync();
+  const hoveredDate = chartSyncContext?.hoveredDate || null;
+  const setHoveredDate = chartSyncContext?.setHoveredDate || (() => {});
+
   const [data, setData] = useState<DurationDataPoint[]>([]);
   const teal = "#6F42C1";
 

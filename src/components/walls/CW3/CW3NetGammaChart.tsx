@@ -17,7 +17,9 @@ type NetGammaDataPoint = {
 function CW3NetGammaChart({ lookback }: PutNetGammaChartProps) {
   const chartRef = useRef<any>(null);
 
-  const { hoveredDate, setHoveredDate } = useChartSync();
+  const chartSyncContext = useChartSync();
+  const hoveredDate = chartSyncContext?.hoveredDate || null;
+  const setHoveredDate = chartSyncContext?.setHoveredDate || (() => {});
   const [data, setData] = useState<NetGammaDataPoint[]>([]);
   const mainColor = "#0096b4";
 

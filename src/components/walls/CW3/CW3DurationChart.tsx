@@ -17,7 +17,9 @@ type DurationDataPoint = {
 
 function CW3DurationChart({ lookback }: DurationChartProps) {
   const chartRef = useRef<any>(null);
-  const { hoveredDate, setHoveredDate } = useChartSync();
+  const chartSyncContext = useChartSync();
+  const hoveredDate = chartSyncContext?.hoveredDate || null;
+  const setHoveredDate = chartSyncContext?.setHoveredDate || (() => {});
   const [data, setData] = useState<DurationDataPoint[]>([]);
   const teal = "#0096b4";
 

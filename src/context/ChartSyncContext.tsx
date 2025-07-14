@@ -23,10 +23,15 @@ export function ChartSyncProvider({ children }: { children: ReactNode }) {
 }
 
 // Hook to use the context
-export function useChartSync() {
+export function useChartSync(): ChartSyncContextType {
   const context = useContext(ChartSyncContext);
-  if (context === undefined) {
+  if (!context) {
     console.warn("useChartSync must be used within a ChartSyncProvider");
+    // Provide fallback to prevent build-time TypeScript error
+    return {
+      hoveredDate: null,
+      setHoveredDate: () => {},
+    };
   }
   return context;
 }
