@@ -1,14 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import Plot from "react-plotly.js";
+import { useChartSync } from "../../../context/ChartSyncContext";
+import type { Layout } from "plotly.js";
+declare const Plotly: typeof import("plotly.js-dist-min");
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -27,9 +22,17 @@ function CW2NetOIChart({
   activeIndex,
   setActiveIndex,
 }: NetOIChartProps) {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
+  const [visible, setVisible] = useState<"both" | "call" | "put">("both");
   const [containerWidth, setContainerWidth] = useState(window.innerWidth);
+
+  const chartRef = useRef<any>(null);
+  const chartSyncContext = useChartSync();
+  const hoveredDate = chartSyncContext?.hoveredDate || null;
+  const setHoveredDate = chartSyncContext?.setHoveredDate || (() => {});
+
   const teal = "#0096b4";
+  const dark = "#212529";
 
   useEffect(() => {
     axios
@@ -44,69 +47,186 @@ function CW2NetOIChart({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const slicedData = selectedRange
-    ? data.slice(selectedRange[0], selectedRange[1] + 1)
-    : data;
+  const slicedData = Array.isArray(data)
+    ? selectedRange
+      ? data.slice(selectedRange[0], selectedRange[1] + 1)
+      : data
+    : [];
 
-  const tooltipFormatter = (value: number) =>
-    value?.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const dates = slicedData.map((d) => d.date);
+  const callOI = slicedData.map((d) => d.call_oi);
+  const putOI = slicedData.map((d) => d.put_oi);
+
+  const traces: Plotly.Data[] = [];
+
+  if (visible === "both" || visible === "call") {
+    traces.push({
+      type: "bar",
+      x: dates,
+      y: callOI,
+      name: "Call OI Δ",
+      marker: { color: teal },
+      hovertemplate:
+        visible === "both"
+          ? "Date: %{x}<br>Call OI Δ: %{y:,.0f}<br>Put OI Δ: %{customdata[0]:,.0f}<extra></extra>"
+          : "Date: %{x}<br>Call OI Δ: %{y:,.0f}<extra></extra>",
+      ...(visible === "both" ? { customdata: putOI.map((v) => [v]) } : {}),
+    });
+  }
+
+  if (visible === "both" || visible === "put") {
+    traces.push({
+      type: "bar",
+      x: dates,
+      y: putOI,
+      name: "Put OI Δ",
+      marker: { color: dark },
+      hovertemplate:
+        visible === "both"
+          ? "Date: %{x}<br>Call OI Δ: %{customdata[0]:,.0f}<br>Put OI Δ: %{y:,.0f}<extra></extra>"
+          : "Date: %{x}<br>Put OI Δ: %{y:,.0f}<extra></extra>",
+      ...(visible === "both" ? { customdata: callOI.map((v) => [v]) } : {}),
+    });
+  }
+
+  // Sync hover effect when hoveredDate changes
+  useEffect(() => {
+    if (!hoveredDate || slicedData.length === 0) return;
+
+    const el = chartRef.current?.el;
+    const index = slicedData.findIndex((d) => d.date === hoveredDate);
+
+    if (el && index !== -1) {
+      try {
+        Plotly.Fx.hover(el, [{ curveNumber: 0, pointNumber: index }]);
+      } catch (err) {
+        console.error("Fx.hover failed in Net OI", err);
+      }
+    }
+  }, [hoveredDate, slicedData]);
 
   return (
     <div
-      className="my-1"
+      className="my-1 border rounded"
       style={{
-        background: "linear-gradient(90deg, #f8f9fa 60%, #d0f0f7 100%)", // ✅ Teal-tinted background
-        borderRadius: "12px",
-        boxShadow: "0 2px 12px 0 rgba(0,150,180,0.07)", // ✅ Teal shadow
-        padding: "1.5rem 1rem",
+        background: "linear-gradient(180deg, #ffffff 20%, #e3f4f6 100%)",
+        borderRadius: "18px",
+        boxShadow:
+          "0 4px 16px rgba(0, 150, 180, 0.15), 0 0 8px rgba(0, 150, 180, 0.15)",
+        padding: "1rem 0.75rem 2rem 0.75rem",
+        marginBottom: "1.5rem",
       }}
     >
-      <h4
-        className="text-uppercase mb-2 mt-1 ps-2"
-        style={{
-          letterSpacing: "0.05em",
-          fontWeight: 900,
-          color: teal,
-          fontSize: "1.25rem",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          textShadow: "0 1px 4px rgba(0,150,180,0.08)", // ✅ Teal text shadow
-          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
-        }}
-      >
-        <span
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <h4
+          className="text-uppercase mb-0 ps-2"
           style={{
-            display: "inline-block",
-            background: "linear-gradient(90deg, #0096b4 60%, #33cbe0 100%)", // ✅ Teal gradient
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            letterSpacing: "0.05em",
             fontWeight: 900,
-            letterSpacing: "0.08em",
+            fontSize: "1.25rem",
+            color: "#212529",
           }}
         >
-          Net OI Change
-        </span>
-      </h4>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={slicedData} syncId="spy-sync">
-          <XAxis dataKey="date" />
-          <YAxis
-            tickFormatter={(value) =>
-              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
-            }
-            tickMargin={12}
-            axisLine={{ stroke: "#ccc", strokeWidth: 1 }}
-            tickLine={false}
-          />
-          <Tooltip
-            cursor={{ stroke: teal, strokeWidth: 2, opacity: 0.7 }}
-            formatter={tooltipFormatter}
-          />
-          <Bar dataKey="call_oi" name="Call OI Δ" fill={teal} barSize={16} />
-          <Bar dataKey="put_oi" name="Put OI Δ" fill="#212529" barSize={16} />
-        </BarChart>
-      </ResponsiveContainer>
+          NET OI Δ
+        </h4>
+        <div className="d-flex justify-content-end mb-2 me-2">
+          <div
+            className="btn-group btn-group-sm"
+            role="group"
+            aria-label="OI Visibility"
+          >
+            {[
+              { label: "Both", value: "both" },
+              { label: "Call OI Δ", value: "call" },
+              { label: "Put OI Δ", value: "put" },
+            ].map(({ label, value }) => (
+              <button
+                key={value}
+                className={`btn btn-outline-secondary ${
+                  visible === value ? "active" : ""
+                }`}
+                onClick={() => setVisible(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <Plot
+        ref={chartRef}
+        data={traces}
+        layout={{
+          height: 310,
+          margin: { t: 5, b: 5, l: 35, r: 10 },
+          barmode: "group",
+          hovermode: "closest",
+          hoverlabel: {
+            bgcolor: "#6c757d",
+            bordercolor: "#212529",
+            font: {
+              family: "Arial, sans-serif",
+              size: 20,
+              weight: "bold",
+              color: "black",
+            },
+            namelength: -1,
+            align: "left",
+          },
+          xaxis: {
+            visible: false,
+            title: "Date",
+            type: "category",
+            tickangle: -45,
+            rangeslider: { visible: false },
+            tickmode: "linear",
+            dtick: 10,
+            tickfont: {
+              size: 10,
+              family: "'Segoe UI', 'Arial', sans-serif",
+            },
+            fixedrange: true,
+            constrain: "domain",
+          },
+          yaxis: {
+            title: "OI Δ",
+            showgrid: false,
+            fixedrange: true,
+            constrain: "domain",
+          },
+          shapes: hoveredDate
+            ? [
+                {
+                  type: "line",
+                  x0: hoveredDate,
+                  x1: hoveredDate,
+                  yref: "paper",
+                  y0: 0,
+                  y1: 1,
+                  line: {
+                    color: teal,
+                    width: 1,
+                    dash: "dash",
+                  },
+                },
+              ]
+            : [],
+          plot_bgcolor: "transparent",
+          paper_bgcolor: "transparent",
+          font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
+          showlegend: false,
+        }}
+        useResizeHandler
+        style={{ width: "100%", height: "280px" }}
+        config={{ responsive: true, displayModeBar: false }}
+        onHover={(event) => {
+          if (event.points && event.points.length > 0) {
+            setHoveredDate(event.points[0].x);
+          }
+        }}
+        onUnhover={() => setHoveredDate(null)}
+      />
     </div>
   );
 }

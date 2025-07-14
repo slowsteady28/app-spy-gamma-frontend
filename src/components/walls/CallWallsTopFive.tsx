@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Row, Col, Card, Form } from "react-bootstrap";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 
 // Import CW1–CW5 charts
 import CW1WallChart from "./CW1/CW1WallChart";
@@ -27,11 +27,34 @@ import CW5NetOIChart from "./CW5/CW5NetOIChart";
 import CW5NetGammaChart from "./CW5/CW5NetGammaChart";
 import CW5DurationChart from "./CW5/CW5DurationChart";
 
+const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 const CallWallsTopFive = () => {
   const [lookback, setLookback] = useState<number>(400);
+  const [loadingWallIndex, setLoadingWallIndex] = useState<number | null>(null);
+  const [lastUpdatedMap, setLastUpdatedMap] = useState<Record<number, Date>>(
+    {}
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookback(Number(e.target.value));
+  };
+
+  const refreshWall = async (index: number) => {
+    const endpoint = `${apiBaseUrl}/api/refresh-cw${index + 1}`;
+    try {
+      setLoadingWallIndex(index);
+      const res = await fetch(endpoint, { method: "POST" });
+      if (!res.ok) throw new Error(`Failed to refresh CW${index + 1}`);
+      setLastUpdatedMap((prev) => ({
+        ...prev,
+        [index]: new Date(),
+      }));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingWallIndex(null);
+    }
   };
 
   const walls = [
@@ -78,6 +101,9 @@ const CallWallsTopFive = () => {
         {walls.map((wall, index) => {
           const { title, WallChart, NetOIChart, NetGammaChart, DurationChart } =
             wall;
+
+          const lastUpdated = lastUpdatedMap[index];
+
           return (
             <Col xs={12} key={index} className="d-flex">
               <Card
@@ -85,34 +111,53 @@ const CallWallsTopFive = () => {
                 style={{ background: "transparent" }}
               >
                 <Card.Header className="bg-transparent border-0 pb-0">
-                  <div className="d-flex align-items-center justify-content-end w-100">
-                    <Form.Group className="mb-0" style={{ maxWidth: 220 }}>
-                      <Form.Select
-                        value={lookback}
-                        onChange={handleChange}
-                        aria-label="Select lookback period"
+                  <div className="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+                    <h5 className="mb-0 fw-bold"></h5>
+                    <div className="d-flex align-items-center gap-0">
+                      <Form.Group className="mb-0" style={{ maxWidth: 220 }}>
+                        <Form.Select
+                          value={lookback}
+                          onChange={handleChange}
+                          aria-label="Select lookback period"
+                          size="sm"
+                          style={{
+                            color: "#fff",
+                            fontWeight: 700,
+                            background: "#111",
+                            border: "1px solid #b39ddb",
+                            borderRadius: "6px",
+                            boxShadow: "0 1px 4px rgba(111,66,193,0.08)",
+                            fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
+                          }}
+                        >
+                          <option value={25}>25 Days</option>
+                          <option value={50}>50 Days</option>
+                          <option value={100}>100 Days</option>
+                          <option value={200}>200 Days</option>
+                          <option value={400}>400 Days</option>
+                        </Form.Select>
+                      </Form.Group>
+                      <Button
+                        variant="outline-primary"
                         size="sm"
-                        style={{
-                          color: "#fff",
-                          fontWeight: 700,
-                          background: "#111",
-                          border: "1px solid #b39ddb",
-                          borderRadius: "6px",
-                          boxShadow: "0 1px 4px rgba(111,66,193,0.08)",
-                          fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
-                        }}
+                        onClick={() => refreshWall(index)}
+                        disabled={loadingWallIndex === index}
                       >
-                        <option value={25}>25 Days</option>
-                        <option value={50}>50 Days</option>
-                        <option value={100}>100 Days</option>
-                        <option value={200}>200 Days</option>
-                        <option value={400}>400 Days</option>
-                      </Form.Select>
-                    </Form.Group>
+                        {loadingWallIndex === index
+                          ? "Refreshing..."
+                          : "Refresh"}
+                      </Button>
+                      <span className="text-dark small">
+                        Last updated:{" "}
+                        {lastUpdated
+                          ? lastUpdated.toLocaleTimeString()
+                          : "Never"}
+                      </span>
+                    </div>
                   </div>
                 </Card.Header>
                 <Card.Body style={{ background: "transparent" }}>
-                  <Row className="g-3" style={{ background: "transparent" }}>
+                  <Row className="g-0" style={{ background: "transparent" }}>
                     <Col xs={12}>
                       <WallChart
                         lookback={lookback}

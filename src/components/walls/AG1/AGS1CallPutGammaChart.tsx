@@ -1,63 +1,147 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Button from "react-bootstrap/Button";
-
-const mainColor = "#212529"; // Dark Bootstrap Gray
-const accentColor = "#495057"; // Slightly lighter gray
-const deepRed = "#8B0000"; // Deep Red for Put Gamma
-const callGray = "#343a40"; // Dark Gray for Call Gamma
+import Plot from "react-plotly.js";
+import { useChartSync } from "../../../context/ChartSyncContext";
+declare const Plotly: typeof import("plotly.js-dist-min");
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-
-type GammaDataPoint = {
-  date: string;
-  call_gamma: number;
-  put_gamma: number;
-};
 
 type Props = {
   lookback: number;
 };
 
-function AbsGamma1CallPutGammaChart({ lookback }: Props) {
-  const [data, setData] = useState<GammaDataPoint[]>([]);
+const AGS1CallPutGammaChart = ({ lookback }: Props) => {
+  const [data, setData] = useState<any[]>([]);
   const [visible, setVisible] = useState<"both" | "call" | "put">("both");
+  const chartRef = useRef<any>(null);
+
+  const chartSyncContext = useChartSync();
+  const hoveredDate = chartSyncContext?.hoveredDate || null;
+  const setHoveredDate = chartSyncContext?.setHoveredDate || (() => {});
 
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/ags1-gamma?lookback=${lookback}`)
-      .then((res) => {
-        console.log("AbsGamma1 Call/Put Gamma Data:", res.data);
-        setData(res.data);
-      })
-      .catch((err) => console.error("Error loading AbsGamma1 gamma data", err));
+      .then((res) => setData(res.data))
+      .catch((err) =>
+        console.error("Error loading AGS1 Call/Put Gamma data", err)
+      );
   }, [lookback]);
 
-  const gammaValues = data
-    .flatMap((d) => [d.call_gamma, d.put_gamma])
-    .filter((v) => typeof v === "number" && !isNaN(v));
-  const minY = gammaValues.length ? Math.min(...gammaValues) : 0;
-  const maxY = gammaValues.length ? Math.max(...gammaValues) : 100;
-  const buffer = (maxY - minY) * 0.05;
+  const slicedData = Array.isArray(data) ? data : [];
+  const dates = slicedData.map((d) => d.date);
+  const callGamma = slicedData.map((d) => d.call_gamma);
+  const putGamma = slicedData.map((d) => d.put_gamma);
+
+  const callColor = "#3e3e3e";
+  const putColor = "#8b0000";
+
+  const traces: Plotly.Data[] = [];
+
+  if (visible === "both" || visible === "call") {
+    traces.push({
+      type: "bar",
+      x: dates,
+      y: callGamma,
+      name: "Call Gamma",
+      marker: { color: callColor },
+      hovertemplate:
+        visible === "both"
+          ? "Date: %{x}<br>Call Γ: %{y:,.0f}<br>Put Γ: %{customdata[0]:,.0f}<extra></extra>"
+          : "Date: %{x}<br>Call Γ: %{y:,.0f}<extra></extra>",
+      ...(visible === "both" ? { customdata: putGamma.map((v) => [v]) } : {}),
+    });
+  }
+
+  if (visible === "both" || visible === "put") {
+    traces.push({
+      type: "bar",
+      x: dates,
+      y: putGamma,
+      name: "Put Gamma",
+      marker: { color: putColor },
+      hovertemplate:
+        visible === "both"
+          ? "Date: %{x}<br>Call Γ: %{customdata[0]:,.0f}<br>Put Γ: %{y:,.0f}<extra></extra>"
+          : "Date: %{x}<br>Put Γ: %{y:,.0f}<extra></extra>",
+      ...(visible === "both" ? { customdata: callGamma.map((v) => [v]) } : {}),
+    });
+  }
+
+  useEffect(() => {
+    if (!hoveredDate || slicedData.length === 0) return;
+    const el = chartRef.current?.el;
+    const index = slicedData.findIndex((d) => d.date === hoveredDate);
+    if (el && index !== -1) {
+      try {
+        Plotly.Fx.hover(el, [{ curveNumber: 0, pointNumber: index }]);
+      } catch (err) {
+        console.error("Fx.hover failed in AGS1CallPutGammaChart", err);
+      }
+    }
+  }, [hoveredDate, slicedData]);
+
+  const layout: Partial<Plotly.Layout> = {
+    height: 220,
+    margin: { t: 5, b: 5, l: 35, r: 10 },
+    barmode: "group",
+    hovermode: "closest",
+    hoverlabel: {
+      bgcolor: "#6c757d",
+      bordercolor: "#212529",
+      font: {
+        family: "Arial, sans-serif",
+        size: 20,
+        color: "white",
+      },
+      namelength: -1,
+      align: "left",
+    },
+    xaxis: {
+      visible: false,
+      type: "category",
+      rangeslider: { visible: false },
+      fixedrange: true,
+    },
+    yaxis: {
+      title: "Gamma",
+      showgrid: false,
+      fixedrange: true,
+    },
+    shapes: hoveredDate
+      ? [
+          {
+            type: "line",
+            x0: hoveredDate,
+            x1: hoveredDate,
+            yref: "paper",
+            y0: 0,
+            y1: 1,
+            line: {
+              color: "#8b0000",
+              width: 1,
+              dash: "dash",
+            },
+          },
+        ]
+      : [],
+    plot_bgcolor: "transparent",
+    paper_bgcolor: "transparent",
+    font: { family: "'Segoe UI', 'Arial', sans-serif" },
+    showlegend: false,
+  };
 
   return (
     <div
-      className="my-1"
+      className="my-1 border rounded"
       style={{
-        background: "linear-gradient(90deg, #f8f9fa 0%, #dee2e6 100%)",
-        borderRadius: "12px",
-        boxShadow: "0 2px 14px rgba(33, 37, 41, 0.07)",
-        padding: "1.5rem 1rem",
+        background:
+          "linear-gradient(180deg, #fff 25%, rgba(56, 52, 52, 0.4) 100%)",
+        borderRadius: "18px",
+        boxShadow:
+          "0 6px 20px rgba(85, 47, 47, 0.50), 0 4px 10px rgba(85, 47, 47, 0.50)",
+        padding: "1rem 0.75rem 2rem 0.75rem",
+        marginBottom: "1.5rem",
       }}
     >
       <div className="d-flex justify-content-between align-items-center mb-2">
@@ -66,83 +150,47 @@ function AbsGamma1CallPutGammaChart({ lookback }: Props) {
           style={{
             letterSpacing: "0.05em",
             fontWeight: 900,
-            color: mainColor,
             fontSize: "1.25rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            textShadow: "0 1px 4px rgba(33, 37, 41, 0.15)",
-            fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
+            color: "#212529",
           }}
         >
-          <span
-            style={{
-              display: "inline-block",
-              background: "linear-gradient(90deg, #212529, #868e96)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontWeight: 900,
-              letterSpacing: "0.08em",
-            }}
-          >
-            Call & Put Gamma
-          </span>
+          CALL & PUT GAMMA
         </h4>
-        <ButtonGroup>
-          <Button
-            variant={visible === "both" ? "dark" : "outline-dark"}
-            size="sm"
-            onClick={() => setVisible("both")}
+        <div className="d-flex justify-content-end mb-2 me-2">
+          <div
+            className="btn-group btn-group-sm"
+            role="group"
+            aria-label="Gamma Visibility"
           >
-            Both
-          </Button>
-          <Button
-            variant={visible === "call" ? "dark" : "outline-dark"}
-            size="sm"
-            onClick={() => setVisible("call")}
-          >
-            Call Gamma
-          </Button>
-          <Button
-            variant={visible === "put" ? "dark" : "outline-dark"}
-            size="sm"
-            onClick={() => setVisible("put")}
-          >
-            Put Gamma
-          </Button>
-        </ButtonGroup>
+            {["both", "call", "put"].map((type) => (
+              <button
+                key={type}
+                className={`btn btn-outline-secondary ${
+                  visible === type ? "active" : ""
+                }`}
+                onClick={() => setVisible(type as any)}
+              >
+                {type === "call" ? "Call Γ" : type === "put" ? "Put Γ" : "Both"}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} syncId="spy-sync">
-          <XAxis dataKey="date" />
-          <YAxis domain={[minY - buffer, maxY + buffer]} />
-          <Tooltip
-            cursor={{ stroke: accentColor, strokeWidth: 2, opacity: 0.5 }}
-            formatter={(value: number) =>
-              value?.toLocaleString(undefined, { maximumFractionDigits: 0 })
-            }
-          />
-          <Legend />
-          {(visible === "both" || visible === "call") && (
-            <Bar
-              dataKey="call_gamma"
-              name="Call Gamma"
-              fill={callGray}
-              radius={[4, 4, 0, 0]}
-            />
-          )}
-          {(visible === "both" || visible === "put") && (
-            <Bar
-              dataKey="put_gamma"
-              name="Put Gamma"
-              fill={deepRed}
-              radius={[4, 4, 0, 0]}
-            />
-          )}
-        </BarChart>
-      </ResponsiveContainer>
+
+      <Plot
+        ref={chartRef}
+        data={traces}
+        layout={layout}
+        useResizeHandler
+        style={{ width: "100%", height: "220px" }}
+        config={{ responsive: true, displayModeBar: false }}
+        onHover={(event) => {
+          if (event.points?.[0]) setHoveredDate(event.points[0].x);
+        }}
+        onUnhover={() => setHoveredDate(null)}
+      />
     </div>
   );
-}
+};
 
-export default AbsGamma1CallPutGammaChart;
+export default AGS1CallPutGammaChart;

@@ -112,7 +112,7 @@ const PutWallsTopFive = () => {
                   </div>
                 </Card.Header>
                 <Card.Body style={{ background: "transparent" }}>
-                  <Row className="g-3" style={{ background: "transparent" }}>
+                  <Row className="g-0" style={{ background: "transparent" }}>
                     <Col xs={12}>
                       <WallChart
                         lookback={lookback}

@@ -21,22 +21,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="d-flex">
-      {/* Mobile Toggle Button */}
-      <button
-        className="btn btn-dark d-sm-none position-fixed top-0 start-0 m-3 zindex-tooltip"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        style={{ zIndex: 1050 }}
-      >
-        ☰
-      </button>
-
-      {/* Sidebar */}
+      {/* Sidebar - position: fixed */}
       <div
         className={`bg-light text-dark p-3 flex-column position-fixed h-100 ${
           sidebarOpen ? "d-flex" : "d-none"
         } d-sm-flex`}
         style={{
-          width: collapsed ? "64px" : "235px",
+          width: collapsed ? "85px" : "235px",
           zIndex: 1040,
           transition: "width 0.2s cubic-bezier(.4,0,.2,1)",
           boxShadow: "0 0 16px 0 rgba(0,0,0,0.07)",
@@ -61,48 +52,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             }`}
           ></i>
         </button>
-
-        {/* Branding */}
-        <div className={`mb-3 text-center ${collapsed ? "px-0" : ""}`}>
-          <span
-            className="fw-bold d-flex align-items-center justify-content-center"
-            style={{
-              fontSize: "1.35rem",
-              color: "#212529",
-              letterSpacing: "0.02em",
-              display: "flex",
-              lineHeight: 1.1,
-              gap: "0.5rem",
-            }}
-          >
-            <img
-              src="/Logo.png"
-              alt="Logo"
-              style={{
-                width: 32,
-                height: 32,
-                objectFit: "contain",
-                marginRight: "0.25rem",
-                verticalAlign: "middle",
-              }}
-            />
-            SPY Gamma
-          </span>
-          {!collapsed && (
-            <span
-              className="text-secondary"
-              style={{
-                fontSize: "0.95rem",
-                fontWeight: 500,
-                letterSpacing: "0.01em",
-                display: "block",
-                marginTop: "0.15rem",
-              }}
-            >
-              Decode Market Structure
-            </span>
-          )}
-        </div>
 
         <hr
           style={{
@@ -219,15 +168,37 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                           backgroundColor: "transparent",
                           borderRadius: "5px",
                           padding: "0.5rem 1.5rem",
+                          display: "flex",
+                          alignItems: "center",
                         }}
                       >
-                        {n === 1
-                          ? "Largest Wall"
-                          : n === 2
-                          ? "2nd Largest Wall"
-                          : n === 3
-                          ? "3rd Largest Wall"
-                          : `${n}th Largest Wall`}
+                        {n === 1 ? (
+                          <>
+                            Largest Wall
+                            <span
+                              style={{
+                                background: "#e6f4ea",
+                                color: "#34a853",
+                                borderRadius: 6,
+                                fontSize: "0.75rem",
+                                fontWeight: 600,
+                                padding: "2px 8px",
+                                marginLeft: 4,
+                                lineHeight: 1,
+                                letterSpacing: "0.02em",
+                                display: "inline-block",
+                              }}
+                            >
+                              FREE
+                            </span>
+                          </>
+                        ) : n === 2 ? (
+                          "2nd Largest Wall"
+                        ) : n === 3 ? (
+                          "3rd Largest Wall"
+                        ) : (
+                          `${n}th Largest Wall`
+                        )}
                       </a>
                     </li>
                   );
@@ -293,15 +264,37 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                           backgroundColor: "transparent",
                           borderRadius: "5px",
                           padding: "0.5rem 1.5rem",
+                          display: "flex",
+                          alignItems: "center",
                         }}
                       >
-                        {n === 1
-                          ? "Largest Wall"
-                          : n === 2
-                          ? "2nd Largest Wall"
-                          : n === 3
-                          ? "3rd Largest Wall"
-                          : `${n}th Largest Wall`}
+                        {n === 1 ? (
+                          <>
+                            Largest Wall
+                            <span
+                              style={{
+                                background: "#e6f4ea",
+                                color: "#34a853",
+                                borderRadius: 6,
+                                fontSize: "0.75rem",
+                                fontWeight: 600,
+                                padding: "2px 8px",
+                                marginLeft: 4,
+                                lineHeight: 1,
+                                letterSpacing: "0.02em",
+                                display: "inline-block",
+                              }}
+                            >
+                              FREE
+                            </span>
+                          </>
+                        ) : n === 2 ? (
+                          "2nd Largest Wall"
+                        ) : n === 3 ? (
+                          "3rd Largest Wall"
+                        ) : (
+                          `${n}th Largest Wall`
+                        )}
                       </a>
                     </li>
                   );
@@ -371,13 +364,33 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                           padding: "0.5rem 1.5rem",
                         }}
                       >
-                        {n === 1
-                          ? "Largest Wall"
-                          : n === 2
-                          ? "2nd Largest Wall"
-                          : n === 3
-                          ? "3rd Largest Wall"
-                          : `${n}th Largest Wall`}
+                        {n === 1 ? (
+                          <>
+                            Largest Wall
+                            <span
+                              style={{
+                                background: "#e6f4ea",
+                                color: "#34a853",
+                                borderRadius: 6,
+                                fontSize: "0.75rem",
+                                fontWeight: 600,
+                                padding: "2px 8px",
+                                marginLeft: 4,
+                                lineHeight: 1,
+                                letterSpacing: "0.02em",
+                                display: "inline-block",
+                              }}
+                            >
+                              FREE
+                            </span>
+                          </>
+                        ) : n === 2 ? (
+                          "2nd Largest Wall"
+                        ) : n === 3 ? (
+                          "3rd Largest Wall"
+                        ) : (
+                          `${n}th Largest Wall`
+                        )}
                       </a>
                     </li>
                   );
@@ -428,6 +441,83 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                     }}
                   >
                     Gamma Flip
+                  </a>
+                </li>
+
+                <li className="nav-item">
+                  <a
+                    className={`nav-link${
+                      isActive("/vertical-gamma") ? " active" : ""
+                    }`}
+                    href="/vertical-gamma"
+                    style={{
+                      fontSize: "0.85rem",
+                      color: isActive("/vertical-gamma")
+                        ? "#0096b4"
+                        : "#212529",
+                      backgroundColor: "transparent",
+                      borderRadius: "5px",
+                      padding: "0.5rem 1.5rem",
+                    }}
+                  >
+                    Vertical Gamma
+                  </a>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* DURATION Section */}
+          <li
+            className={`nav-item text-uppercase text-secondary small mb-2 mt-4 ps-2 ${
+              collapsed ? "d-none" : ""
+            }`}
+          >
+            TOP EXPIRATIONS
+          </li>
+          <li className="nav-item">
+            <div
+              style={{
+                cursor: "pointer",
+                padding: "0.5rem 1.5rem",
+                backgroundColor: "#212529",
+                borderRadius: "5px",
+                color: "#fff",
+              }}
+              className={`d-flex align-items-center ${
+                collapsed ? "justify-content-center" : ""
+              }`}
+            >
+              <i className="bi bi-clock-history me-2"></i>
+              {!collapsed && (
+                <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                  CALL GAMMA
+                </span>
+              )}
+            </div>
+            {/* Subsection for Call Gamma */}
+            {!collapsed && (
+              <ul
+                className="nav flex-column"
+                style={{ marginLeft: "1.5rem", paddingLeft: "0.5rem" }}
+              >
+                <li className="nav-item">
+                  <a
+                    className={`nav-link${
+                      isActive("/cw1-top-3-expirations") ? " active" : ""
+                    }`}
+                    href="/cw1-top-3-expirations"
+                    style={{
+                      fontSize: "0.85rem",
+                      color: isActive("/cw1-top-3-expirations")
+                        ? "#0096b4"
+                        : "#212529",
+                      backgroundColor: "transparent",
+                      borderRadius: "5px",
+                      padding: "0.5rem 1.5rem",
+                    }}
+                  >
+                    Largest Wall
                   </a>
                 </li>
               </ul>
@@ -503,12 +593,14 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           </li>
           <li className="nav-item">
             <a
-              className={`nav-link${isActive("/careers") ? " active" : ""}`}
-              href="/careers"
+              className={`nav-link${
+                isActive("/privacy-policy") ? " active" : ""
+              }`}
+              href="/privacy-policy"
               style={{
                 fontSize: "0.9rem",
-                color: isActive("/careers") ? "#0096b4" : "#212529",
-                backgroundColor: isActive("/careers")
+                color: isActive("/privacy-policy") ? "#0096b4" : "#212529",
+                backgroundColor: isActive("/privacy-policy")
                   ? "#e0f7fa"
                   : "transparent",
                 borderRadius: "5px",
@@ -520,10 +612,41 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               }}
             >
               <i
-                className="bi bi-briefcase me-2"
-                style={{ color: isActive("/careers") ? "#0096b4" : "#adb5bd" }}
+                className="bi bi-shield-lock me-2"
+                style={{
+                  color: isActive("/privacy-policy") ? "#0096b4" : "#adb5bd",
+                }}
               ></i>
-              {!collapsed && "Careers"}
+              {!collapsed && "Privacy Policy"}
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              className={`nav-link${
+                isActive("/terms-of-service") ? " active" : ""
+              }`}
+              href="/terms-of-service"
+              style={{
+                fontSize: "0.9rem",
+                color: isActive("/terms-of-service") ? "#0096b4" : "#212529",
+                backgroundColor: isActive("/terms-of-service")
+                  ? "#e0f7fa"
+                  : "transparent",
+                borderRadius: "5px",
+                padding: "0.5rem 1.5rem",
+                fontWeight: 500,
+                letterSpacing: "0.01em",
+                marginBottom: "2px",
+                transition: "background 0.15s, color 0.15s",
+              }}
+            >
+              <i
+                className="bi bi-file-text me-2"
+                style={{
+                  color: isActive("/terms-of-service") ? "#0096b4" : "#adb5bd",
+                }}
+              ></i>
+              {!collapsed && "Terms of Service"}
             </a>
           </li>
           <li className="nav-item">
@@ -574,9 +697,14 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         style={{
           marginLeft:
             isDesktop || sidebarOpen ? (collapsed ? "64px" : "235px") : "0",
-          backgroundColor: "#f8f9fa",
+          background:
+            "linear-gradient(to right, #f8f9fa 60%, #f1f3f5 90%, #e9ecef 100%)",
           minHeight: "100vh",
           transition: "margin-left 0.3s ease",
+          boxShadow: "inset -20px 0 30px -10px rgba(0,0,0,0.03)", // smooth fade on right edge
+          borderTopRightRadius: "1rem", // optional: softens upper right corner
+          borderBottomRightRadius: "1rem", // optional: softens lower right corner
+          overflowX: "hidden", // prevents sidebar/content overflow
         }}
       >
         {children}

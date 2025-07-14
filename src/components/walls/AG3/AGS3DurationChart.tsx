@@ -1,63 +1,148 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Button from "react-bootstrap/Button";
-
-const mainColor = "#212529";
-const accentColor = "#495057";
-const deepRed = "#8B0000";
-const callGray = "#343a40";
+import Plot from "react-plotly.js";
+import { useChartSync } from "../../../context/ChartSyncContext";
+declare const Plotly: typeof import("plotly.js-dist-min");
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-
-type DurationDataPoint = {
-  date: string;
-  call_duration: number;
-  put_duration: number;
-};
 
 type Props = {
   lookback: number;
 };
 
-function AGS3DurationChart({ lookback }: Props) {
-  const [data, setData] = useState<DurationDataPoint[]>([]);
+const AGS3DurationChart = ({ lookback }: Props) => {
+  const [data, setData] = useState<any[]>([]);
   const [visible, setVisible] = useState<"both" | "call" | "put">("both");
+  const chartRef = useRef<any>(null);
+
+  const chartSyncContext = useChartSync();
+  const hoveredDate = chartSyncContext?.hoveredDate || null;
+  const setHoveredDate = chartSyncContext?.setHoveredDate || (() => {});
 
   useEffect(() => {
     axios
       .get(`${apiBaseUrl}/data/ags3-duration?lookback=${lookback}`)
       .then((res) => {
-        // Check if your API returns { data: [...] } or just [...]
         const arr = Array.isArray(res.data) ? res.data : res.data.data;
         setData(arr);
       })
       .catch((err) => console.error("Error loading AGS3 Duration data", err));
   }, [lookback]);
 
-  // Add this for debugging
-  console.log("Duration data:", data);
+  const dates = data.map((d) => d.date);
+  const roundToNearestHalf = (value: number) => Math.round(value * 2) / 2;
 
-  const tooltipFormatter = (value: number) =>
-    value?.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const callDur = data.map((d) => roundToNearestHalf(d.call_duration));
+  const putDur = data.map((d) => roundToNearestHalf(d.put_duration));
+
+  const callColor = "#343a40";
+  const putColor = "#8b0000";
+
+  const traces: Plotly.Data[] = [];
+
+  if (visible === "both" || visible === "call") {
+    traces.push({
+      type: "bar",
+      x: dates,
+      y: callDur,
+      name: "Call Duration",
+      marker: { color: callColor },
+      hovertemplate:
+        visible === "both"
+          ? "Date: %{x}<br>Call D: %{y}<br>Put D: %{customdata[0]}<extra></extra>"
+          : "Date: %{x}<br>Call D: %{y}<extra></extra>",
+      ...(visible === "both" ? { customdata: putDur.map((v) => [v]) } : {}),
+    });
+  }
+
+  if (visible === "both" || visible === "put") {
+    traces.push({
+      type: "bar",
+      x: dates,
+      y: putDur,
+      name: "Put Duration",
+      marker: { color: putColor },
+      hovertemplate:
+        visible === "both"
+          ? "Date: %{x}<br>Call D: %{customdata[0]}<br>Put D: %{y}<extra></extra>"
+          : "Date: %{x}<br>Put D: %{y}<extra></extra>",
+      ...(visible === "both" ? { customdata: callDur.map((v) => [v]) } : {}),
+    });
+  }
+
+  useEffect(() => {
+    if (!hoveredDate || data.length === 0) return;
+    const el = chartRef.current?.el;
+    const index = data.findIndex((d) => d.date === hoveredDate);
+    if (el && index !== -1) {
+      try {
+        Plotly.Fx.hover(el, [{ curveNumber: 0, pointNumber: index }]);
+      } catch (err) {
+        console.error("Fx.hover failed in AGS3DurationChart", err);
+      }
+    }
+  }, [hoveredDate, data]);
+
+  const layout: Partial<Plotly.Layout> = {
+    height: 220,
+    margin: { t: 5, b: 5, l: 35, r: 10 },
+    barmode: "group",
+    hovermode: "closest",
+    hoverlabel: {
+      bgcolor: "#6c757d",
+      bordercolor: "#212529",
+      font: {
+        family: "Arial, sans-serif",
+        size: 20,
+        color: "white",
+      },
+      namelength: -1,
+      align: "left",
+    },
+    xaxis: {
+      visible: false,
+      type: "category",
+      fixedrange: true,
+    },
+    yaxis: {
+      title: "Duration",
+      showgrid: false,
+      fixedrange: true,
+    },
+    shapes: hoveredDate
+      ? [
+          {
+            type: "line",
+            x0: hoveredDate,
+            x1: hoveredDate,
+            yref: "paper",
+            y0: 0,
+            y1: 1,
+            line: {
+              color: "#8b0000",
+              width: 1,
+              dash: "dash",
+            },
+          },
+        ]
+      : [],
+    plot_bgcolor: "transparent",
+    paper_bgcolor: "transparent",
+    font: { family: "'Segoe UI', 'Arial', sans-serif" },
+    showlegend: false,
+  };
 
   return (
     <div
-      className="my-1"
+      className="my-1 border rounded"
       style={{
-        background: "linear-gradient(90deg, #f8f9fa 0%, #dee2e6 100%)",
-        borderRadius: "12px",
-        boxShadow: "0 2px 12px 0 rgba(33, 37, 41, 0.07)",
-        padding: "1.5rem 1rem",
+        background:
+          "linear-gradient(180deg, #fff 25%, rgba(56, 52, 52, 0.4) 100%)",
+        borderRadius: "18px",
+        boxShadow:
+          "0 6px 20px rgba(85, 47, 47, 0.50), 0 4px 10px rgba(85, 47, 47, 0.50)",
+        padding: "1rem 0.75rem 2rem 0.75rem",
+        marginBottom: "1.5rem",
       }}
     >
       <div className="d-flex justify-content-between align-items-center mb-2">
@@ -66,81 +151,47 @@ function AGS3DurationChart({ lookback }: Props) {
           style={{
             letterSpacing: "0.05em",
             fontWeight: 900,
-            color: mainColor,
             fontSize: "1.25rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            textShadow: "0 1px 4px rgba(33, 37, 41, 0.15)",
-            fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
+            color: "#212529",
           }}
         >
-          <span
-            style={{
-              display: "inline-block",
-              background: "linear-gradient(90deg, #212529, #868e96)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontWeight: 900,
-              letterSpacing: "0.08em",
-            }}
-          >
-            Call & Put Duration
-          </span>
+          CALL & PUT DURATION
         </h4>
-        <ButtonGroup>
-          <Button
-            variant={visible === "both" ? "dark" : "outline-dark"}
-            size="sm"
-            onClick={() => setVisible("both")}
+        <div className="d-flex justify-content-end mb-2 me-2">
+          <div
+            className="btn-group btn-group-sm"
+            role="group"
+            aria-label="Duration Toggle"
           >
-            Both
-          </Button>
-          <Button
-            variant={visible === "call" ? "dark" : "outline-dark"}
-            size="sm"
-            onClick={() => setVisible("call")}
-          >
-            Call Duration
-          </Button>
-          <Button
-            variant={visible === "put" ? "dark" : "outline-dark"}
-            size="sm"
-            onClick={() => setVisible("put")}
-          >
-            Put Duration
-          </Button>
-        </ButtonGroup>
+            {["both", "call", "put"].map((type) => (
+              <button
+                key={type}
+                className={`btn btn-outline-secondary ${
+                  visible === type ? "active" : ""
+                }`}
+                onClick={() => setVisible(type as any)}
+              >
+                {type === "call" ? "Call D" : type === "put" ? "Put D" : "Both"}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} syncId="spy-sync">
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip
-            cursor={{ stroke: accentColor, strokeWidth: 2, opacity: 0.5 }}
-            formatter={tooltipFormatter}
-          />
-          <Legend />
-          {(visible === "both" || visible === "call") && (
-            <Bar
-              dataKey="call_duration"
-              name="Call Duration"
-              fill={callGray}
-              radius={[4, 4, 0, 0]}
-            />
-          )}
-          {(visible === "both" || visible === "put") && (
-            <Bar
-              dataKey="put_duration"
-              name="Put Duration"
-              fill={deepRed}
-              radius={[4, 4, 0, 0]}
-            />
-          )}
-        </BarChart>
-      </ResponsiveContainer>
+
+      <Plot
+        ref={chartRef}
+        data={traces}
+        layout={layout}
+        useResizeHandler
+        style={{ width: "100%", height: "220px" }}
+        config={{ responsive: true, displayModeBar: false }}
+        onHover={(event) => {
+          if (event.points?.[0]) setHoveredDate(event.points[0].x);
+        }}
+        onUnhover={() => setHoveredDate(null)}
+      />
     </div>
   );
-}
+};
 
 export default AGS3DurationChart;
