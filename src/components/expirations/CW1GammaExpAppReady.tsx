@@ -20,9 +20,7 @@ const CW1LongTermExp = () => {
         minHeight: "75vh",
         paddingTop: "9vh", // ⬅️ Pushes background and charts down by 20% of viewport height
         background: `
-          radial-gradient(circle at 20% 30%, rgba(0, 150, 180, 0.18), transparent 50%),
-          radial-gradient(circle at 80% 70%, rgba(255, 105, 135, 0.15), transparent 50%),
-          linear-gradient(180deg, #0e1116 0%, #161b21 100%)
+          transparent
         `,
         backgroundAttachment: "fixed",
         paddingBottom: "225px",
@@ -67,6 +65,7 @@ const CW1LongTermExp = () => {
                         fontFamily: "'Segoe UI', 'Arial', 'sans-serif'",
                       }}
                     >
+                      <option value={50}>50 Days</option>
                       <option value={100}>100 Days</option>
                       <option value={200}>200 Days</option>
                       <option value={400}>400 Days</option>

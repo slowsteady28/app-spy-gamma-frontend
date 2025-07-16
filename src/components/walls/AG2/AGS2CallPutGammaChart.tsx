@@ -104,7 +104,7 @@ const AGS2CallPutGammaChart = ({ lookback }: Props) => {
       fixedrange: true,
     },
     yaxis: {
-      title: "Gamma",
+      title: { text: "Gamma" }, // ✅ Properly typed
       showgrid: false,
       fixedrange: true,
     },

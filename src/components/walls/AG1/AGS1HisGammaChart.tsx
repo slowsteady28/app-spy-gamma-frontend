@@ -4,7 +4,10 @@ import Plot from "react-plotly.js";
 import type { Layout } from "plotly.js";
 import { expirationLines } from "../utils/expirationDates";
 import { useChartSync } from "../../../context/ChartSyncContext";
-declare const Plotly: typeof import("plotly.js-dist-min");
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -35,7 +38,16 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
         );
         const rawData = response.data;
 
-        const formattedData = rawData.map((d: any) => ({
+        type CandleDataPoint = {
+          date: string;
+          open: number;
+          high: number;
+          low: number;
+          close: number;
+          ags1?: number; // if you also include AGS1
+        };
+
+        const formattedData: CandleDataPoint[] = rawData.map((d: any) => ({
           date: d.date,
           ags1: d.ags1,
           open: d["SPY OPEN"],
@@ -151,7 +163,7 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
       constrain: "domain",
     },
     hovermode: "closest",
-    dragmode: "crosshair",
+    dragmode: false,
     shapes,
     margin: { l: 35, r: 0, t: 0, b: 0 },
     autosize: true,
@@ -235,7 +247,7 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
             color: "#212529",
           }}
         >
-          ABSOLUTE GAMMA STRIKE
+          LARGEST ABSOLUTE GAMMA WALL
         </h4>
         <div className="d-flex justify-content-end me-2">
           <div
@@ -275,7 +287,10 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
           staticPlot: false,
         }}
         onHover={(event) => {
-          if (event.points?.[0]) setHoveredDate(event.points[0].x);
+          if (event.points?.[0]) {
+            const hoveredX = String(event.points[0].x); // ✅ Safely convert to string
+            setHoveredDate(hoveredX);
+          }
         }}
         onUnhover={() => setHoveredDate(null)}
       />

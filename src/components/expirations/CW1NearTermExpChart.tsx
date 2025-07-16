@@ -99,6 +99,18 @@ const CW1NearTermExpChart: React.FC<CW1NearTermExpChartProps> = ({
           zerolinecolor: "transparent", // ⬅️ Remove axis line
         },
         hovermode: "x unified",
+        hoverlabel: {
+          bgcolor: "#6c757d",
+          bordercolor: "#212529",
+          font: {
+            family: "Arial, sans-serif",
+            size: 20,
+            weight: "bold",
+            color: "black",
+          },
+          namelength: -1,
+          align: "left",
+        },
         autosize: true,
         margin: { t: 50, l: 60, b: 100, r: 30 },
         legend: {
@@ -107,6 +119,7 @@ const CW1NearTermExpChart: React.FC<CW1NearTermExpChartProps> = ({
           y: 1.15,
           font: { color: "#e0e0e0" },
         },
+        showlegend: false, // Hide legend for cleaner look
       }}
       style={{ width: "100%", height: "600px", background: "transparent" }}
       useResizeHandler={true}

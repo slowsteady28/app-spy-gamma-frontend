@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Plot from "react-plotly.js";
 import { useChartSync } from "../../../context/ChartSyncContext";
-declare const Plotly: typeof import("plotly.js-dist-min");
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -105,7 +108,7 @@ const AGS1DurationChart = ({ lookback }: Props) => {
       fixedrange: true,
     },
     yaxis: {
-      title: "Duration",
+      title: { text: "Duration" }, // ✅ Properly typed
       showgrid: false,
       fixedrange: true,
     },
@@ -186,7 +189,10 @@ const AGS1DurationChart = ({ lookback }: Props) => {
         style={{ width: "100%", height: "220px" }}
         config={{ responsive: true, displayModeBar: false }}
         onHover={(event) => {
-          if (event.points?.[0]) setHoveredDate(event.points[0].x);
+          if (event.points?.[0]) {
+            const hoveredX = String(event.points[0].x); // ✅ FIX HERE
+            setHoveredDate(hoveredX);
+          }
         }}
         onUnhover={() => setHoveredDate(null)}
       />
