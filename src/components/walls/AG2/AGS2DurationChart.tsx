@@ -108,7 +108,7 @@ const AGS2DurationChart = ({ lookback }: Props) => {
       fixedrange: true,
     },
     yaxis: {
-      title: "Duration",
+      title: { text: "Duration" }, // ✅ Properly typed
       showgrid: false,
       fixedrange: true,
     },

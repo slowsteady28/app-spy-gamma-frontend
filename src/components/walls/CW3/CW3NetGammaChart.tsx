@@ -2,6 +2,10 @@ import { useRef, useEffect, useState } from "react";
 import axios from "axios";
 import Plot from "react-plotly.js";
 import { useChartSync } from "../../../context/ChartSyncContext";
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -137,7 +141,7 @@ function CW3NetGammaChart({ lookback }: PutNetGammaChartProps) {
         config={{ responsive: true, displayModeBar: false, staticPlot: true }}
         onHover={(event) => {
           if (event.points && event.points.length > 0) {
-            setHoveredDate(event.points[0].x);
+            setHoveredDate(String(event.points[0].x));
           }
         }}
         onUnhover={() => setHoveredDate(null)}

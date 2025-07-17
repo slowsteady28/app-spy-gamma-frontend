@@ -141,7 +141,7 @@ function CW1DurationChart({ lookback }: DurationChartProps) {
         config={{ responsive: true, displayModeBar: false, staticPlot: true }}
         onHover={(event) => {
           if (event.points && event.points.length > 0) {
-            setHoveredDate(event.points[0].x);
+            setHoveredDate(String(event.points[0].x));
           }
         }}
         onUnhover={() => setHoveredDate(null)}
