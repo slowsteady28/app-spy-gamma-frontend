@@ -108,7 +108,7 @@ const AGS3NetOIChart = ({ lookback }: Props) => {
       constrain: "domain",
     },
     yaxis: {
-      title: "OI Δ",
+      title: { text: "OI Δ" },
       showgrid: false,
       fixedrange: true,
       constrain: "domain",
@@ -194,7 +194,10 @@ const AGS3NetOIChart = ({ lookback }: Props) => {
         style={{ width: "100%", height: "280px" }}
         config={{ responsive: true, displayModeBar: false }}
         onHover={(event) => {
-          if (event.points?.[0]) setHoveredDate(event.points[0].x);
+          if (event.points?.[0]) {
+            const hoveredX = String(event.points[0].x); // ✅ FIX HERE
+            setHoveredDate(hoveredX);
+          }
         }}
         onUnhover={() => setHoveredDate(null)}
       />

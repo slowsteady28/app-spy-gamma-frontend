@@ -85,7 +85,7 @@ const AGS3CallPutGammaChart = ({ lookback }: Props) => {
   }, [hoveredDate, slicedData]);
 
   const layout: Partial<Plotly.Layout> = {
-    height: 310,
+    height: 220,
     margin: { t: 5, b: 5, l: 35, r: 10 },
     barmode: "group",
     hovermode: "closest",
@@ -107,7 +107,7 @@ const AGS3CallPutGammaChart = ({ lookback }: Props) => {
       fixedrange: true,
     },
     yaxis: {
-      title: "Gamma",
+      title: { text: "Gamma" }, // ✅ Properly typed
       showgrid: false,
       fixedrange: true,
     },
@@ -185,10 +185,13 @@ const AGS3CallPutGammaChart = ({ lookback }: Props) => {
         data={traces}
         layout={layout}
         useResizeHandler
-        style={{ width: "100%", height: "280px" }}
+        style={{ width: "100%", height: "220px" }}
         config={{ responsive: true, displayModeBar: false }}
         onHover={(event) => {
-          if (event.points?.[0]) setHoveredDate(event.points[0].x);
+          if (event.points?.[0]) {
+            const hoveredX = String(event.points[0].x); // ✅ FIX HERE
+            setHoveredDate(hoveredX);
+          }
         }}
         onUnhover={() => setHoveredDate(null)}
       />

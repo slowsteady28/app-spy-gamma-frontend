@@ -189,7 +189,10 @@ const AGS3DurationChart = ({ lookback }: Props) => {
         style={{ width: "100%", height: "220px" }}
         config={{ responsive: true, displayModeBar: false }}
         onHover={(event) => {
-          if (event.points?.[0]) setHoveredDate(event.points[0].x);
+          if (event.points?.[0]) {
+            const hoveredX = String(event.points[0].x); // ✅ FIX HERE
+            setHoveredDate(hoveredX);
+          }
         }}
         onUnhover={() => setHoveredDate(null)}
       />

@@ -38,7 +38,16 @@ const AGS3HisGammaChart = ({ lookback }: Props) => {
         );
         const rawData = response.data;
 
-        const formattedData = rawData.map((d: any) => ({
+        type CandleDataPoint = {
+          date: string;
+          open: number;
+          high: number;
+          low: number;
+          close: number;
+          ags3?: number; // if you also include AGS1
+        };
+
+        const formattedData: CandleDataPoint[] = rawData.map((d: any) => ({
           date: d.date,
           ags3: d.ags3,
           open: d["SPY OPEN"],
@@ -154,7 +163,7 @@ const AGS3HisGammaChart = ({ lookback }: Props) => {
       constrain: "domain",
     },
     hovermode: "closest",
-    dragmode: "crosshair",
+    dragmode: false,
     shapes,
     margin: { l: 35, r: 0, t: 0, b: 0 },
     autosize: true,
@@ -238,7 +247,7 @@ const AGS3HisGammaChart = ({ lookback }: Props) => {
             color: "#212529",
           }}
         >
-          3RD LARGEST ABSOLUTE GAMMA WALL
+          2ND LARGEST ABSOLUTE GAMMA WALL
         </h4>
         <div className="d-flex justify-content-end me-2">
           <div
@@ -278,7 +287,10 @@ const AGS3HisGammaChart = ({ lookback }: Props) => {
           staticPlot: false,
         }}
         onHover={(event) => {
-          if (event.points?.[0]) setHoveredDate(event.points[0].x);
+          if (event.points?.[0]) {
+            const hoveredX = String(event.points[0].x); // ✅ FIX HERE
+            setHoveredDate(hoveredX);
+          }
         }}
         onUnhover={() => setHoveredDate(null)}
       />
