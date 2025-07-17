@@ -273,7 +273,7 @@ function PW1WallChart({
             color: "#212529",
           }}
         >
-          LARGEST PUT WALL
+          2ND LARGEST PUT WALL
         </h4>
         <div className="d-flex justify-content-end mb-2 me-2">
           <div

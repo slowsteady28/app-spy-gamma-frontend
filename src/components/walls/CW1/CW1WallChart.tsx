@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Plot from "react-plotly.js";
-declare const Plotly: typeof import("plotly.js-dist-min");
+
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
+
 import { Layout, PlotData } from "plotly.js";
 import { useChartSync } from "../../../context/ChartSyncContext";
 import { expirationLines } from "../utils/expirationDates";

@@ -3,7 +3,10 @@ import axios from "axios";
 import Plot from "react-plotly.js";
 import { useChartSync } from "../../../context/ChartSyncContext";
 import type { Layout } from "plotly.js";
-declare const Plotly: typeof import("plotly.js-dist-min");
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
