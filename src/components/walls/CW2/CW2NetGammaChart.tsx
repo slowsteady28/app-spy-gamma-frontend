@@ -78,69 +78,79 @@ function CW2NetGammaChart({ lookback }: PutNetGammaChartProps) {
 
       <Plot
         ref={chartRef}
-        data={[
-          {
-            x: dates,
-            y: gamma,
-            type: "bar",
-            name: "Net Gamma",
-            marker: { color: mainColor, opacity: 0.8 },
-          },
-        ]}
-        layout={{
-          height: 220,
-          margin: { t: 0, b: 0, l: 40, r: 10 },
-          xaxis: {
-            visible: false,
-            title: "Date",
-            type: "category",
-            tickangle: -45,
-            dtick: 10,
-          },
-          yaxis: {
-            title: "Gamma",
-            showgrid: false,
-          },
-          shapes: hoveredDate
-            ? [
-                {
-                  type: "line",
-                  x0: hoveredDate,
-                  x1: hoveredDate,
-                  yref: "paper",
-                  y0: 0,
-                  y1: 1,
-                  line: {
-                    color: mainColor,
-                    width: 1,
-                    dash: "dash",
-                  },
-                },
-              ]
-            : [],
-          hovermode: "closest",
-          hoverlabel: {
-            bgcolor: "#6c757d",
-            bordercolor: "#212529",
-            font: {
-              family: "Arial, sans-serif",
-              size: 20,
-              weight: "bold",
-              color: "black",
+        data={
+          [
+            {
+              x: dates,
+              y: gamma,
+              type: "bar" as const,
+              name: "Net Gamma",
+              marker: { color: mainColor, opacity: 0.8 },
             },
-            namelength: -1,
-            align: "left",
-          },
-          showlegend: false,
-          plot_bgcolor: "transparent",
-          paper_bgcolor: "transparent",
-          font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
-        }}
+          ] as Plotly.Data[]
+        }
+        layout={
+          {
+            height: 220,
+            margin: { t: 0, b: 0, l: 40, r: 10 },
+            xaxis: {
+              visible: false,
+              title: "Date",
+              type: "category",
+              tickangle: -45,
+              dtick: 10,
+            },
+            yaxis: {
+              title: "Gamma",
+              showgrid: false,
+            },
+            shapes: hoveredDate
+              ? ([
+                  {
+                    type: "line",
+                    x0: hoveredDate,
+                    x1: hoveredDate,
+                    yref: "paper",
+                    y0: 0,
+                    y1: 1,
+                    line: {
+                      color: mainColor,
+                      width: 1,
+                      dash: "dash",
+                    },
+                  },
+                ] as Plotly.Shape[])
+              : [],
+            hovermode: "closest",
+            hoverlabel: {
+              bgcolor: "#6c757d",
+              bordercolor: "#212529",
+              font: {
+                family: "Arial, sans-serif",
+                size: 20,
+                color: "black",
+              },
+              namelength: -1,
+              align: "left",
+            },
+            showlegend: false,
+            plot_bgcolor: "transparent",
+            paper_bgcolor: "transparent",
+            font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
+          } as Partial<Plotly.Layout>
+        }
         useResizeHandler
         style={{ width: "100%", height: "220px" }}
-        config={{ responsive: true, displayModeBar: false, staticPlot: true }}
+        config={
+          {
+            responsive: true,
+            displayModeBar: false,
+            staticPlot: true,
+          } as Partial<Plotly.Config>
+        }
         onHover={(event) => {
-          if (event.points && event.points.length > 0) {
+          if (event.points?.length) {
+            // ✅ Safely cast Datum to string
             setHoveredDate(String(event.points[0].x));
           }
         }}

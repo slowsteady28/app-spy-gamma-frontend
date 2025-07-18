@@ -132,8 +132,6 @@ const PW3AppReady = () => {
                         setSelectedRange={() => {}}
                         activeIndex={null}
                         setActiveIndex={() => {}}
-                        showMonthly={true}
-                        showQuarterly={true}
                       />
                     </Col>
                   </Row>

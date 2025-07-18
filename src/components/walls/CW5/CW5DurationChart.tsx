@@ -2,7 +2,10 @@ import { useRef, useEffect, useState } from "react";
 import axios from "axios";
 import Plot from "react-plotly.js";
 import { useChartSync } from "../../../context/ChartSyncContext";
-declare const Plotly: typeof import("plotly.js-dist-min");
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -76,63 +79,66 @@ function CW5DurationChart({ lookback }: DurationChartProps) {
 
       <Plot
         ref={chartRef}
-        data={[
-          {
-            x: dates,
-            y: durations,
-            type: "bar",
-            name: "Avg Days Held",
-            marker: { color: teal },
-            hovertemplate:
-              "Date: %{x}<br>Duration: %{y:.1f} days<extra></extra>",
-          },
-        ]}
-        layout={{
-          height: 220,
-          margin: { t: 0, b: 0, l: 40, r: 10 },
-          xaxis: {
-            visible: false,
-            type: "category",
-          },
-          yaxis: {
-            title: "Duration (days)",
-            showgrid: false,
-          },
-          shapes: hoveredDate
-            ? [
-                {
-                  type: "line",
-                  x0: hoveredDate,
-                  x1: hoveredDate,
-                  yref: "paper",
-                  y0: 0,
-                  y1: 1,
-                  line: {
-                    color: teal,
-                    width: 1,
-                    dash: "dash",
-                  },
-                },
-              ]
-            : [],
-          hovermode: "closest",
-          hoverlabel: {
-            bgcolor: "#6c757d",
-            bordercolor: "#212529",
-            font: {
-              family: "Arial, sans-serif",
-              size: 20,
-              weight: "bold",
-              color: "black",
+        data={
+          [
+            {
+              x: dates,
+              y: durations,
+              type: "bar" as const, // ✅ ensures it's a valid trace type
+              name: "Avg Days Held",
+              marker: { color: teal },
+              hovertemplate:
+                "Date: %{x}<br>Duration: %{y:.1f} days<extra></extra>",
             },
-            namelength: -1,
-            align: "left",
-          },
-          showlegend: false,
-          plot_bgcolor: "transparent",
-          paper_bgcolor: "transparent",
-          font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
-        }}
+          ] as Plotly.Data[]
+        } // ✅ force TS to treat it as valid
+        layout={
+          {
+            height: 220,
+            margin: { t: 0, b: 0, l: 40, r: 10 },
+            xaxis: {
+              visible: false,
+              type: "category",
+            },
+            yaxis: {
+              title: "Duration (days)",
+              showgrid: false,
+            },
+            shapes: hoveredDate
+              ? ([
+                  {
+                    type: "line",
+                    x0: hoveredDate,
+                    x1: hoveredDate,
+                    yref: "paper",
+                    y0: 0,
+                    y1: 1,
+                    line: {
+                      color: teal,
+                      width: 1,
+                      dash: "dash",
+                    },
+                  },
+                ] as Plotly.Shape[])
+              : [],
+            hovermode: "closest",
+            hoverlabel: {
+              bgcolor: "#6c757d",
+              bordercolor: "#212529",
+              font: {
+                family: "Arial, sans-serif",
+                size: 20,
+                color: "black",
+              },
+              namelength: -1,
+              align: "left",
+            },
+            showlegend: false,
+            plot_bgcolor: "transparent",
+            paper_bgcolor: "transparent",
+            font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
+          } as Partial<Plotly.Layout>
+        } // ✅ cast to loosen validation
         useResizeHandler
         style={{ width: "100%", height: "220px" }}
         config={{ responsive: true, displayModeBar: false, staticPlot: true }}

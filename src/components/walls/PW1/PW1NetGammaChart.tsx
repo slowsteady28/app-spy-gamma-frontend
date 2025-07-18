@@ -76,69 +76,72 @@ function PW1NetGammaChart({ lookback }: PutNetGammaChartProps) {
 
       <Plot
         ref={chartRef}
-        data={[
-          {
-            x: dates,
-            y: gamma,
-            type: "bar",
-            name: "Net Gamma",
-            marker: { color: mainColor, opacity: 0.8 },
-          },
-        ]}
-        layout={{
-          height: 220,
-          margin: { t: 0, b: 0, l: 40, r: 10 },
-          xaxis: {
-            visible: false,
-            title: "Date",
-            type: "category",
-            tickangle: -45,
-            dtick: 10,
-          },
-          yaxis: {
-            title: "Gamma",
-            showgrid: false,
-          },
-          shapes: hoveredDate
-            ? [
-                {
-                  type: "line",
-                  x0: hoveredDate,
-                  x1: hoveredDate,
-                  yref: "paper",
-                  y0: 0,
-                  y1: 1,
-                  line: {
-                    color: mainColor,
-                    width: 1,
-                    dash: "dash",
-                  },
-                },
-              ]
-            : [],
-          hovermode: "closest",
-          hoverlabel: {
-            bgcolor: "#6c757d",
-            bordercolor: "#212529",
-            font: {
-              family: "Arial, sans-serif",
-              size: 20,
-              weight: "bold",
-              color: "black",
+        data={
+          [
+            {
+              x: dates,
+              y: gamma,
+              type: "bar" as const, // ✅ literal type avoids mismatch
+              name: "Net Gamma",
+              marker: { color: mainColor, opacity: 0.8 },
             },
-            namelength: -1,
-            align: "left",
-          },
-          showlegend: false,
-          plot_bgcolor: "transparent",
-          paper_bgcolor: "transparent",
-          font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
-        }}
+          ] as Plotly.Data[]
+        } // ✅ cast to stop over-validation
+        layout={
+          {
+            height: 220,
+            margin: { t: 0, b: 0, l: 40, r: 10 },
+            xaxis: {
+              visible: false,
+              title: "Date",
+              type: "category",
+              tickangle: -45,
+              dtick: 10,
+            },
+            yaxis: {
+              title: "Gamma",
+              showgrid: false,
+            },
+            shapes: hoveredDate
+              ? ([
+                  {
+                    type: "line" as const, // ✅ ensures TS sees valid Plotly shape type
+                    x0: hoveredDate,
+                    x1: hoveredDate,
+                    yref: "paper",
+                    y0: 0,
+                    y1: 1,
+                    line: {
+                      color: mainColor,
+                      width: 1,
+                      dash: "dash",
+                    },
+                  },
+                ] as Partial<Plotly.Shape>[])
+              : [],
+            hovermode: "closest",
+            hoverlabel: {
+              bgcolor: "#6c757d",
+              bordercolor: "#212529",
+              font: {
+                family: "Arial, sans-serif",
+                size: 20,
+                color: "black", // ✅ removed unsupported weight
+              },
+              namelength: -1,
+              align: "left",
+            },
+            showlegend: false,
+            plot_bgcolor: "transparent",
+            paper_bgcolor: "transparent",
+            font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
+          } as Partial<Plotly.Layout>
+        } // ✅ cast relaxes strict typing
         useResizeHandler
         style={{ width: "100%", height: "220px" }}
         config={{ responsive: true, displayModeBar: false, staticPlot: true }}
         onHover={(event) => {
-          if (event.points && event.points.length > 0) {
+          if (event.points?.length) {
             setHoveredDate(String(event.points[0].x));
           }
         }}

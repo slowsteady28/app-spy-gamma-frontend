@@ -3,7 +3,10 @@ import axios from "axios";
 import Plot from "react-plotly.js";
 import { useChartSync } from "../../../context/ChartSyncContext";
 import type { Layout } from "plotly.js";
-declare const Plotly: typeof import("plotly.js-dist-min");
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -145,7 +148,9 @@ function PW4NetOIChart({
                 className={`btn btn-outline-secondary ${
                   visible === value ? "active" : ""
                 }`}
-                onClick={() => setVisible(value)}
+                onClick={
+                  () => setVisible(value as "both" | "call" | "put") // ✅ cast to valid union
+                }
               >
                 {label}
               </button>
@@ -156,73 +161,74 @@ function PW4NetOIChart({
 
       <Plot
         ref={chartRef}
-        data={traces}
-        layout={{
-          height: 310,
-          margin: { t: 5, b: 5, l: 35, r: 10 },
-          barmode: "group",
-          hovermode: "closest",
-          hoverlabel: {
-            bgcolor: "#6c757d",
-            bordercolor: "#212529",
-            font: {
-              family: "Arial, sans-serif",
-              size: 20,
-              weight: "bold",
-              color: "black",
+        data={traces as Plotly.Data[]} // ✅ cast to relax typing
+        layout={
+          {
+            height: 310,
+            margin: { t: 5, b: 5, l: 35, r: 10 },
+            barmode: "group",
+            hovermode: "closest",
+            hoverlabel: {
+              bgcolor: "#6c757d",
+              bordercolor: "#212529",
+              font: {
+                family: "Arial, sans-serif",
+                size: 20,
+                color: "black", // ✅ removed weight
+              },
+              namelength: -1,
+              align: "left",
             },
-            namelength: -1,
-            align: "left",
-          },
-          xaxis: {
-            visible: false,
-            title: "Date",
-            type: "category",
-            tickangle: -45,
-            rangeslider: { visible: false },
-            tickmode: "linear",
-            dtick: 10,
-            tickfont: {
-              size: 10,
-              family: "'Segoe UI', 'Arial', sans-serif",
+            xaxis: {
+              visible: false,
+              title: "Date",
+              type: "category",
+              tickangle: -45,
+              rangeslider: { visible: false },
+              tickmode: "linear",
+              dtick: 10,
+              tickfont: {
+                size: 10,
+                family: "'Segoe UI', 'Arial', sans-serif",
+              },
+              fixedrange: true,
+              constrain: "domain",
             },
-            fixedrange: true,
-            constrain: "domain",
-          },
-          yaxis: {
-            title: "OI Δ",
-            showgrid: false,
-            fixedrange: true,
-            constrain: "domain",
-          },
-          shapes: hoveredDate
-            ? [
-                {
-                  type: "line",
-                  x0: hoveredDate,
-                  x1: hoveredDate,
-                  yref: "paper",
-                  y0: 0,
-                  y1: 1,
-                  line: {
-                    color: teal,
-                    width: 1,
-                    dash: "dash",
+            yaxis: {
+              title: "OI Δ",
+              showgrid: false,
+              fixedrange: true,
+              constrain: "domain",
+            },
+            shapes: hoveredDate
+              ? ([
+                  {
+                    type: "line" as const, // ✅ literal union
+                    x0: hoveredDate,
+                    x1: hoveredDate,
+                    yref: "paper",
+                    y0: 0,
+                    y1: 1,
+                    line: {
+                      color: teal,
+                      width: 1,
+                      dash: "dash",
+                    },
                   },
-                },
-              ]
-            : [],
-          plot_bgcolor: "transparent",
-          paper_bgcolor: "transparent",
-          font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
-          showlegend: false,
-        }}
+                ] as Partial<Plotly.Shape>[])
+              : [],
+            plot_bgcolor: "transparent",
+            paper_bgcolor: "transparent",
+            font: { family: "'Segoe UI', 'Arial', 'sans-serif'" },
+            showlegend: false,
+          } as Partial<Plotly.Layout>
+        }
         useResizeHandler
         style={{ width: "100%", height: "280px" }}
         config={{ responsive: true, displayModeBar: false }}
         onHover={(event) => {
-          if (event.points && event.points.length > 0) {
-            setHoveredDate(event.points[0].x);
+          if (event.points?.length) {
+            setHoveredDate(String(event.points[0].x)); // ✅ cast Datum → string
           }
         }}
         onUnhover={() => setHoveredDate(null)}

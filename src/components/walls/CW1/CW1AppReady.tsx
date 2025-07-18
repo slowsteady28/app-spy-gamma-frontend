@@ -132,8 +132,6 @@ const CW1AppReady = () => {
                         setSelectedRange={() => {}}
                         activeIndex={null}
                         setActiveIndex={() => {}}
-                        showMonthly={true}
-                        showQuarterly={true}
                       />
                     </Col>
                   </Row>

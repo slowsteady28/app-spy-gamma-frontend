@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Plot from "react-plotly.js";
-declare const Plotly: typeof import("plotly.js-dist-min");
+
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
+
 import { Layout, PlotData } from "plotly.js";
 import { useChartSync } from "../../../context/ChartSyncContext";
 import { expirationLines } from "../utils/expirationDates";
@@ -117,7 +122,7 @@ function CW3WallChart({
   if (expirationType === "Monthly" || expirationType === "Both") {
     expirationShapes.push(
       ...expirationLines.monthly.map((date) => ({
-        type: "line",
+        type: "line" as const,
         x0: date,
         x1: date,
         yref: "paper",
@@ -188,14 +193,14 @@ function CW3WallChart({
       constrain: "domain",
     },
     hovermode: "closest",
-    shapes: expirationShapes,
+    shapes: expirationShapes as Partial<Plotly.Shape>[],
     legend: {
       orientation: "h",
       y: 1.1,
       x: 0.5,
       xanchor: "center",
     },
-    dragmode: "crosshair",
+    dragmode: false,
     margin: { l: 35, r: 0, t: 0, b: 0 },
     autosize: true,
     height: 500,
@@ -208,7 +213,7 @@ function CW3WallChart({
       font: {
         family: "Arial, sans-serif",
         size: 20,
-        weight: "bold",
+        color: "black",
       },
       namelength: -1,
       align: "left",
@@ -273,7 +278,7 @@ function CW3WallChart({
             color: "#212529",
           }}
         >
-          3RD LARGEST CALL WALL
+          3 RD LARGEST CALL WALL
         </h4>
         <div className="d-flex justify-content-end mb-2 me-2">
           <div

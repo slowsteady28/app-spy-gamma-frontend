@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Plot from "react-plotly.js";
-declare const Plotly: typeof import("plotly.js-dist-min");
+
+import * as PlotlyJS from "plotly.js-dist-min";
+
+// ✅ Simple cast
+const Plotly: any = PlotlyJS;
 import { Layout, PlotData } from "plotly.js";
 import { useChartSync } from "../../../context/ChartSyncContext";
 import { expirationLines } from "../utils/expirationDates";
@@ -157,7 +161,7 @@ function PW1WallChart({
       y0: 0,
       y1: 1,
       line: {
-        color: "#0096b4",
+        color: "#6f42c1",
         width: 1,
         dash: "dash",
       },
@@ -188,14 +192,14 @@ function PW1WallChart({
       constrain: "domain",
     },
     hovermode: "closest",
-    shapes: expirationShapes,
+    shapes: expirationShapes as Partial<Plotly.Shape>[],
     legend: {
       orientation: "h",
       y: 1.1,
       x: 0.5,
       xanchor: "center",
     },
-    dragmode: "crosshair",
+    dragmode: false,
     margin: { l: 35, r: 0, t: 0, b: 0 },
     autosize: true,
     height: 500,
@@ -208,7 +212,6 @@ function PW1WallChart({
       font: {
         family: "Arial, sans-serif",
         size: 20,
-        weight: "bold",
       },
       namelength: -1,
       align: "left",
@@ -273,7 +276,7 @@ function PW1WallChart({
             color: "#212529",
           }}
         >
-          2ND LARGEST PUT WALL
+          LARGEST PUT WALL
         </h4>
         <div className="d-flex justify-content-end mb-2 me-2">
           <div

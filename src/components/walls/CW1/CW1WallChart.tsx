@@ -122,7 +122,7 @@ function CW1WallChart({
   if (expirationType === "Monthly" || expirationType === "Both") {
     expirationShapes.push(
       ...expirationLines.monthly.map((date) => ({
-        type: "line",
+        type: "line" as const,
         x0: date,
         x1: date,
         yref: "paper",
@@ -193,14 +193,14 @@ function CW1WallChart({
       constrain: "domain",
     },
     hovermode: "closest",
-    shapes: expirationShapes,
+    shapes: expirationShapes as Partial<Plotly.Shape>[],
     legend: {
       orientation: "h",
       y: 1.1,
       x: 0.5,
       xanchor: "center",
     },
-    dragmode: "crosshair",
+    dragmode: false,
     margin: { l: 35, r: 0, t: 0, b: 0 },
     autosize: true,
     height: 500,
@@ -213,7 +213,7 @@ function CW1WallChart({
       font: {
         family: "Arial, sans-serif",
         size: 20,
-        weight: "bold",
+        color: "black",
       },
       namelength: -1,
       align: "left",

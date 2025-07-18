@@ -6,7 +6,6 @@ import CW3WallChart from "./CW3WallChart";
 import CW3NetOIChart from "./CW3NetOIChart";
 import CW3NetGammaChart from "./CW3NetGammaChart";
 import CW3DurationChart from "./CW3DurationChart";
-import CW3HoverSyncChart from "./CW3HoverSyncChart";
 import ChartSkeleton from "../utils/ChartSkeleton";
 
 const mainColor = "#0096b4";
@@ -133,8 +132,6 @@ const CW3AppReady = () => {
                         setSelectedRange={() => {}}
                         activeIndex={null}
                         setActiveIndex={() => {}}
-                        showMonthly={true}
-                        showQuarterly={true}
                       />
                     </Col>
                   </Row>
