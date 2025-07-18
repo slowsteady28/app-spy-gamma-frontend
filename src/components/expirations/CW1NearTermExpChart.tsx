@@ -105,7 +105,6 @@ const CW1NearTermExpChart: React.FC<CW1NearTermExpChartProps> = ({
           font: {
             family: "Arial, sans-serif",
             size: 20,
-            weight: "bold",
             color: "black",
           },
           namelength: -1,

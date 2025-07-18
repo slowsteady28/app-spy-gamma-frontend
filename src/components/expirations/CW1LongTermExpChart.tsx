@@ -105,7 +105,6 @@ const CW1LongTermExpChart: React.FC<CW1LongTermExpChartProps> = ({
           font: {
             family: "Arial, sans-serif",
             size: 20,
-            weight: "bold",
             color: "black",
           },
           namelength: -1,
