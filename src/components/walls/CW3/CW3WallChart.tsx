@@ -278,7 +278,7 @@ function CW3WallChart({
             color: "#212529",
           }}
         >
-          3 RD LARGEST CALL WALL
+          3RD LARGEST CALL WALL
         </h4>
         <div className="d-flex justify-content-end mb-2 me-2">
           <div

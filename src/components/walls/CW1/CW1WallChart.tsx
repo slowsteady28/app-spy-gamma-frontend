@@ -55,33 +55,36 @@ function CW1WallChart({
   const fetchData = async () => {
     setIsLoading(true);
     setError(null);
+
     try {
       const response = await axios.get(
         `${apiBaseUrl}/data/cw1-history?lookback=${lookback}`
       );
-      const formattedData = Array.isArray(response.data)
-        ? response.data.map((item: any) => ({
-            date: item["date"] || item["Date"],
-            price: Number(item["price"] || item["Price"]),
-            cw1: Number(item["cw1"] || item["CW1"]),
-            open: Number(item["open"] || item["SPY OPEN"]),
-            high: Number(item["high"] || item["SPY HIGH"]),
-            low: Number(item["low"] || item["SPY LOW"]),
-            close: Number(item["close"] || item["SPY CLOSE"]),
-            volume: Number(item["volume"] || item["SPY VOLUME"]),
-            sd: Number(item["sd"] || item["SPY SD"]),
-          }))
-        : response.data.data.map((item: any) => ({
-            date: item["Date"] || item.date,
-            price: Number(item["Price"] || item.price),
-            cw1: Number(item["CW1"] || item.cw1),
-            open: Number(item["SPY OPEN"] || item.open),
-            high: Number(item["SPY HIGH"] || item.high),
-            low: Number(item["SPY LOW"] || item.low),
-            close: Number(item["SPY CLOSE"] || item.close),
-            volume: Number(item["SPY VOLUME"] || item.volume),
-            sd: Number(item["SPY SD"] || item.sd),
-          }));
+
+      // ✅ Debug: check how backend data is shaped
+      console.log("RAW API response:", response.data);
+
+      if (!Array.isArray(response.data)) {
+        console.error(
+          "❌ Expected a plain array, but got:",
+          typeof response.data
+        );
+        setError("Backend returned unexpected format");
+        return;
+      }
+
+      // ✅ Directly map from plain array
+      const formattedData = response.data.map((item: any) => ({
+        date: item["Date"] || item.date,
+        price: Number(item["Price"] || item.price),
+        cw1: Number(item["CW1"] || item.cw1),
+        open: Number(item["SPY OPEN"] || item.open),
+        high: Number(item["SPY HIGH"] || item.high),
+        low: Number(item["SPY LOW"] || item.low),
+        close: Number(item["SPY CLOSE"] || item.close),
+        volume: Number(item["SPY VOLUME"] || item.volume),
+        sd: Number(item["SPY SD"] || item.sd),
+      }));
 
       setWallPriceData(formattedData);
       setLastUpdated(new Date());
@@ -104,6 +107,32 @@ function CW1WallChart({
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [lookback]);
+
+  useEffect(() => {
+    if (wallPriceData.length > 0) {
+      const cw1Values = wallPriceData.map((d) => d.cw1);
+      const candleLows = wallPriceData.map((d) => d.low);
+      const candleHighs = wallPriceData.map((d) => d.high);
+
+      const minCW1 = Math.min(...cw1Values);
+      const maxCW1 = Math.max(...cw1Values);
+
+      const minCandle = Math.min(...candleLows);
+      const maxCandle = Math.max(...candleHighs);
+
+      console.log("✅ CW1 Y-range:", minCW1, maxCW1);
+      console.log("✅ Candlestick Y-range:", minCandle, maxCandle);
+    }
+  }, [wallPriceData]);
+
+  useEffect(() => {
+    if (wallPriceData.length > 0) {
+      const badCandles = wallPriceData.filter((d) => d.low === 0);
+      if (badCandles.length > 0) {
+        console.warn("⚠️ Found candle(s) with low=0:", badCandles);
+      }
+    }
+  }, [wallPriceData]);
 
   useEffect(() => {
     if (!hoveredDate || wallPriceData.length === 0) return;
@@ -182,15 +211,15 @@ function CW1WallChart({
         size: 10,
         family: "'Segoe UI', 'Arial', sans-serif",
       },
-      fixedrange: true,
-      constrain: "domain",
+      fixedrange: false,
+      autorange: true,
     },
     yaxis: {
       side: "left",
       showgrid: false,
       type: "log",
-      fixedrange: true,
-      constrain: "domain",
+      fixedrange: false,
+      autorange: true,
     },
     hovermode: "closest",
     shapes: expirationShapes as Partial<Plotly.Shape>[],
@@ -255,6 +284,35 @@ function CW1WallChart({
       </div>
     );
   }
+
+  const handleRelayout = (event: any) => {
+    const x0 = event["xaxis.range[0]"];
+    const x1 = event["xaxis.range[1]"];
+
+    // Only run when slider updates
+    if (x0 && x1 && wallPriceData.length > 0) {
+      const start = new Date(x0).getTime();
+      const end = new Date(x1).getTime();
+
+      // Filter visible points
+      const visibleData = wallPriceData.filter((d) => {
+        const t = new Date(d.date).getTime();
+        return t >= start && t <= end;
+      });
+
+      if (visibleData.length > 0) {
+        const yVals = visibleData.map((d) => d.cw1);
+        const minY = Math.min(...yVals);
+        const maxY = Math.max(...yVals);
+        const pad = (maxY - minY) * 0.05;
+
+        // Force new y-axis range only for CW1 visible subset
+        window.Plotly.relayout(chartRef.current.el, {
+          "yaxis.range": [minY - pad, maxY + pad],
+        });
+      }
+    }
+  };
 
   return (
     <div
@@ -334,12 +392,12 @@ function CW1WallChart({
         style={{ width: "100%", height: "500px" }}
         config={{
           responsive: true,
-          displayModeBar: false,
+          displayModeBar: true,
           displaylogo: false,
-          scrollZoom: false,
+          scrollZoom: true,
           doubleClick: false,
-          modeBarButtonsToRemove: ["zoom2d", "pan2d", "select2d", "lasso2d"],
-          editable: false,
+
+          editable: true,
           staticPlot: false,
         }}
         onHover={(event) => {
