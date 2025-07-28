@@ -177,6 +177,10 @@ const CW1AppReady = () => {
                       <CW1DurationChart lookback={lookback} />
                     </Col>
                   </Row>
+                  <Row
+                    className="g-0"
+                    style={{ background: "transparent", margin: 0 }}
+                  ></Row>
                 </Card.Body>
               </Card>
             </Col>
