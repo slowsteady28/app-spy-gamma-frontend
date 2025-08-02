@@ -247,7 +247,7 @@ const AGS3HisGammaChart = ({ lookback }: Props) => {
             color: "#212529",
           }}
         >
-          2ND LARGEST ABSOLUTE GAMMA WALL
+          3RD LARGEST ABSOLUTE GAMMA WALL
         </h4>
         <div className="d-flex justify-content-end me-2">
           <div

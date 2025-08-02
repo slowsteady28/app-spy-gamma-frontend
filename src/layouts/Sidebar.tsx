@@ -20,7 +20,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const isActive = (href: string) => location.pathname === href;
 
   return (
-    <div className="d-flex">
+    <div className="d-flex ">
       {/* Sidebar - position: fixed */}
       <div
         className={`bg-light text-dark p-3 flex-column position-fixed h-100 ${
