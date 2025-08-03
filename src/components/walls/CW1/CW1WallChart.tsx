@@ -346,15 +346,15 @@ function CW1WallChart({
           ...(showGammaFlip
             ? [
                 {
-                  type: "scatter",
+                  type: "scatter" as const,
+                  mode: "lines+markers" as const,
                   x: wallPriceData.map((item) => item.date),
                   y: wallPriceData.map((item) => item.gamma_flip),
                   name: "Gamma Flip",
-                  mode: "lines+markers",
                   line: {
                     color: "#ffa500",
                     width: 2,
-                    dash: "dot",
+                    dash: "dot" as const,
                   },
                   hovertemplate:
                     "Date: %{x}<br>Gamma Flip: %{y:.0f}<extra></extra>",
