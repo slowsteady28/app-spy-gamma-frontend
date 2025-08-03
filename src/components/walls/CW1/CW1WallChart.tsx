@@ -23,7 +23,8 @@ interface WallPriceData {
   close: number;
   volume: number;
   sd: number;
-  gamma_flip: number; // ← ADD THIS
+  gamma_flip: number;
+  pw1: number;
 }
 
 interface CW1WallChartProps {
@@ -45,6 +46,7 @@ function CW1WallChart({
     "Monthly" | "Quarterly" | "Both" | "None"
   >("Both");
   const [showGammaFlip, setShowGammaFlip] = useState<boolean>(true);
+  const [showLargestPW, setShowLargestPW] = useState<boolean>(true);
   const [wallPriceData, setWallPriceData] = useState<WallPriceData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,32 +63,22 @@ function CW1WallChart({
       const response = await axios.get(
         `${apiBaseUrl}/data/cw1-history?lookback=${lookback}`
       );
-      console.log("CW1 Wall Data Response:", response.data);
-      const formattedData = Array.isArray(response.data)
-        ? response.data.map((item: any) => ({
-            date: item["date"] || item["Date"],
-            price: Number(item["price"] || item["Price"]),
-            cw1: Number(item["cw1"] || item["CW1"]),
-            open: Number(item["open"] || item["SPY OPEN"]),
-            high: Number(item["high"] || item["SPY HIGH"]),
-            low: Number(item["low"] || item["SPY LOW"]),
-            close: Number(item["close"] || item["SPY CLOSE"]),
-            volume: Number(item["volume"] || item["SPY VOLUME"]),
-            sd: Number(item["sd"] || item["SPY SD"]),
-            gamma_flip: Number(item["gamma_flip"] || item["Gamma Flip"]), // ← ADD THIS
-          }))
-        : response.data.data.map((item: any) => ({
-            date: item["Date"] || item.date,
-            price: Number(item["Price"] || item.price),
-            cw1: Number(item["CW1"] || item.cw1),
-            open: Number(item["SPY OPEN"] || item.open),
-            high: Number(item["SPY HIGH"] || item.high),
-            low: Number(item["SPY LOW"] || item.low),
-            close: Number(item["SPY CLOSE"] || item.close),
-            volume: Number(item["SPY VOLUME"] || item.volume),
-            sd: Number(item["SPY SD"] || item.sd),
-            gamma_flip: Number(item["gamma_flip"] || item["Gamma Flip"]), // ← ADD THIS
-          }));
+      const formattedData = response.data.map((item: any) => {
+        console.log("Raw item:", item);
+        return {
+          date: item["date"] || item["Date"],
+          price: Number(item["price"] || item["Price"]),
+          cw1: Number(item["cw1"] || item["CW1"]),
+          open: Number(item["open"] || item["SPY OPEN"]),
+          high: Number(item["high"] || item["SPY HIGH"]),
+          low: Number(item["low"] || item["SPY LOW"]),
+          close: Number(item["close"] || item["SPY CLOSE"]),
+          volume: Number(item["volume"] || item["SPY VOLUME"]),
+          sd: Number(item["sd"] || item["SPY SD"]),
+          gamma_flip: Number(item["gamma_flip"] || item["Gamma Flip"]),
+          pw1: Number(item["pw1"] || item["PW1"]),
+        };
+      });
 
       setWallPriceData(formattedData);
       setLastUpdated(new Date());
@@ -325,6 +317,28 @@ function CW1WallChart({
               Hide Gamma Flip
             </button>
           </div>
+          <div
+            className="btn-group btn-group-sm ms-2"
+            role="group"
+            aria-label="Largest Put Wall Toggle"
+          >
+            <button
+              className={`btn btn-outline-secondary ${
+                showLargestPW ? "active" : ""
+              }`}
+              onClick={() => setShowLargestPW(true)}
+            >
+              Show Largest PW
+            </button>
+            <button
+              className={`btn btn-outline-secondary ${
+                !showLargestPW ? "active" : ""
+              }`}
+              onClick={() => setShowLargestPW(false)}
+            >
+              Hide Largest PW
+            </button>
+          </div>
         </div>
       </div>
 
@@ -358,6 +372,24 @@ function CW1WallChart({
                   },
                   hovertemplate:
                     "Date: %{x}<br>Gamma Flip: %{y:.0f}<extra></extra>",
+                },
+              ]
+            : []),
+          ...(showLargestPW
+            ? [
+                {
+                  type: "scatter" as const,
+                  mode: "lines+markers" as const,
+                  x: wallPriceData.map((item) => item.date),
+                  y: wallPriceData.map((item) => item.pw1),
+                  name: "Largest Put Wall",
+                  line: {
+                    color: "#6f42c1",
+                    width: 2,
+                    dash: "dot" as const,
+                  },
+                  hovertemplate:
+                    "Date: %{x}<br>Largest Put Wall: %{y:.0f}<extra></extra>",
                 },
               ]
             : []),
