@@ -399,74 +399,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             )}
           </li>
 
-          {/* REGIME SHIFT */}
-          <li className="nav-item mt-3">
-            <div
-              style={{
-                cursor: "pointer",
-                padding: "0.5rem 1.5rem",
-                backgroundColor: "#212529",
-                borderRadius: "5px",
-                color: "#fff",
-              }}
-              className={`d-flex align-items-center ${
-                collapsed ? "justify-content-center" : ""
-              }`}
-              onClick={() => {}} // No submenu, so no toggle needed
-            >
-              <i className="bi bi-lightning-charge me-2"></i>
-              {!collapsed && (
-                <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
-                  REGIME SHIFT
-                </span>
-              )}
-            </div>
-            {!collapsed && (
-              <ul
-                className="nav flex-column"
-                style={{ marginLeft: "1.5rem", paddingLeft: "0.5rem" }}
-              >
-                <li className="nav-item">
-                  <a
-                    className={`nav-link${
-                      isActive("/gamma-flip") ? " active" : ""
-                    }`}
-                    href="/gamma-flip"
-                    style={{
-                      fontSize: "0.85rem",
-                      color: isActive("/gamma-flip") ? "#0096b4" : "#212529",
-                      backgroundColor: "transparent",
-                      borderRadius: "5px",
-                      padding: "0.5rem 1.5rem",
-                    }}
-                  >
-                    Gamma Flip
-                  </a>
-                </li>
-
-                <li className="nav-item">
-                  <a
-                    className={`nav-link${
-                      isActive("/vertical-gamma") ? " active" : ""
-                    }`}
-                    href="/vertical-gamma"
-                    style={{
-                      fontSize: "0.85rem",
-                      color: isActive("/vertical-gamma")
-                        ? "#0096b4"
-                        : "#212529",
-                      backgroundColor: "transparent",
-                      borderRadius: "5px",
-                      padding: "0.5rem 1.5rem",
-                    }}
-                  >
-                    Vertical Gamma
-                  </a>
-                </li>
-              </ul>
-            )}
-          </li>
-
           {/* DURATION Section */}
           <li
             className={`nav-item text-uppercase text-secondary small mb-2 mt-4 ps-2 ${
@@ -524,43 +456,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             )}
           </li>
 
-          {/* Analytics Section */}
-          <li
-            className={`nav-item text-uppercase text-secondary small mb-2 mt-4 ps-2 ${
-              collapsed ? "d-none" : ""
-            }`}
-          >
-            Analytics
-          </li>
-          <li className="nav-item">
-            <a
-              href="/commentary"
-              className="nav-link ps-0"
-              tabIndex={collapsed ? -1 : 0}
-            >
-              <div
-                className={`d-flex align-items-center ${
-                  collapsed ? "justify-content-center" : ""
-                }`}
-                style={{
-                  cursor: "pointer",
-                  padding: "0.5rem 1.5rem",
-                  backgroundColor: "#212529",
-                  borderRadius: "5px",
-                  color: isActive("/scribble") ? "#0d6efd" : "#fff",
-                }}
-              >
-                <i className="bi bi-pencil-square me-2"></i>
-                {!collapsed && (
-                  <span style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
-                    Coming Soon
-                  </span>
-                )}
-              </div>
-            </a>
-          </li>
-
-          {/* COMPANY Section */}
+          {/* 
           <li
             className={`nav-item text-uppercase text-secondary small mb-2 mt-4 ps-2 ${
               collapsed ? "d-none" : ""
@@ -568,6 +464,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           >
             Company
           </li>
+          
           <li className="nav-item">
             <a
               className={`nav-link${isActive("/about") ? " active" : ""}`}
@@ -688,6 +585,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               &copy; {new Date().getFullYear()} SPY GAMMA
             </div>
           </li>
+          */}
         </ul>
       </div>
 
