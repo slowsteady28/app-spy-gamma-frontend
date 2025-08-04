@@ -7,6 +7,7 @@ import CW1NetOIChart from "./CW1NetOIChart";
 import CW1NetGammaChart from "./CW1NetGammaChart";
 import CW1DurationChart from "./CW1DurationChart";
 import ChartSkeleton from "../utils/ChartSkeleton";
+import SPYHourlyChart from "../../prices/SPYHourlyChart";
 
 const mainColor = "#0096b4";
 const priceColor = "#212529";
@@ -177,6 +178,19 @@ const CW1AppReady = () => {
                       <CW1DurationChart lookback={lookback} />
                     </Col>
                   </Row>
+
+                  <Row
+                    className="g-0"
+                    style={{ background: "transparent", margin: 0 }}
+                  >
+                    <Col
+                      xs={12}
+                      style={{ background: "transparent", padding: 0 }}
+                    >
+                      <SPYHourlyChart lookback={lookback} />
+                    </Col>
+                  </Row>
+
                   <Row
                     className="g-0"
                     style={{ background: "transparent", margin: 0 }}

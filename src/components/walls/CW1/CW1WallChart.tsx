@@ -64,7 +64,6 @@ function CW1WallChart({
         `${apiBaseUrl}/data/cw1-history?lookback=${lookback}`
       );
       const formattedData = response.data.map((item: any) => {
-        console.log("Raw item:", item);
         return {
           date: item["date"] || item["Date"],
           price: Number(item["price"] || item["Price"]),

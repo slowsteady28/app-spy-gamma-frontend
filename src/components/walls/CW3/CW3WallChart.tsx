@@ -23,6 +23,8 @@ interface WallPriceData {
   close: number;
   volume: number;
   sd: number;
+  gamma_flip: number;
+  pw3: number;
 }
 
 interface CW3WallChartProps {
@@ -43,6 +45,8 @@ function CW3WallChart({
   const [expirationType, setExpirationType] = useState<
     "Monthly" | "Quarterly" | "Both" | "None"
   >("Both");
+  const [showGammaFlip, setShowGammaFlip] = useState<boolean>(true);
+  const [showLargestPW, setShowLargestPW] = useState<boolean>(true);
   const [wallPriceData, setWallPriceData] = useState<WallPriceData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,29 +63,21 @@ function CW3WallChart({
       const response = await axios.get(
         `${apiBaseUrl}/data/cw3-history?lookback=${lookback}`
       );
-      const formattedData = Array.isArray(response.data)
-        ? response.data.map((item: any) => ({
-            date: item["date"] || item["Date"],
-            price: Number(item["price"] || item["Price"]),
-            cw3: Number(item["cw3"] || item["CW3"]),
-            open: Number(item["open"] || item["SPY OPEN"]),
-            high: Number(item["high"] || item["SPY HIGH"]),
-            low: Number(item["low"] || item["SPY LOW"]),
-            close: Number(item["close"] || item["SPY CLOSE"]),
-            volume: Number(item["volume"] || item["SPY VOLUME"]),
-            sd: Number(item["sd"] || item["SPY SD"]),
-          }))
-        : response.data.data.map((item: any) => ({
-            date: item["Date"] || item.date,
-            price: Number(item["Price"] || item.price),
-            cw3: Number(item["CW3"] || item.cw3),
-            open: Number(item["SPY OPEN"] || item.open),
-            high: Number(item["SPY HIGH"] || item.high),
-            low: Number(item["SPY LOW"] || item.low),
-            close: Number(item["SPY CLOSE"] || item.close),
-            volume: Number(item["SPY VOLUME"] || item.volume),
-            sd: Number(item["SPY SD"] || item.sd),
-          }));
+      const formattedData = response.data.map((item: any) => {
+        return {
+          date: item["date"] || item["Date"],
+          price: Number(item["price"] || item["Price"]),
+          cw3: Number(item["cw3"] || item["CW3"]),
+          open: Number(item["open"] || item["SPY OPEN"]),
+          high: Number(item["high"] || item["SPY HIGH"]),
+          low: Number(item["low"] || item["SPY LOW"]),
+          close: Number(item["close"] || item["SPY CLOSE"]),
+          volume: Number(item["volume"] || item["SPY VOLUME"]),
+          sd: Number(item["sd"] || item["SPY SD"]),
+          gamma_flip: Number(item["gamma_flip"] || item["Gamma Flip"]),
+          pw3: Number(item["pw3"] || item["PW3"]),
+        };
+      });
 
       setWallPriceData(formattedData);
       setLastUpdated(new Date());
@@ -278,7 +274,7 @@ function CW3WallChart({
             color: "#212529",
           }}
         >
-          3RD LARGEST CALL WALL
+          2nd LARGEST CALL WALL
         </h4>
         <div className="d-flex justify-content-end mb-2 me-2">
           <div
@@ -298,6 +294,50 @@ function CW3WallChart({
               </button>
             ))}
           </div>
+          <div
+            className="btn-group btn-group-sm ms-2"
+            role="group"
+            aria-label="Gamma Flip Toggle"
+          >
+            <button
+              className={`btn btn-outline-secondary ${
+                showGammaFlip ? "active" : ""
+              }`}
+              onClick={() => setShowGammaFlip(true)}
+            >
+              Show Gamma Flip
+            </button>
+            <button
+              className={`btn btn-outline-secondary ${
+                !showGammaFlip ? "active" : ""
+              }`}
+              onClick={() => setShowGammaFlip(false)}
+            >
+              Hide Gamma Flip
+            </button>
+          </div>
+          <div
+            className="btn-group btn-group-sm ms-2"
+            role="group"
+            aria-label="Largest Put Wall Toggle"
+          >
+            <button
+              className={`btn btn-outline-secondary ${
+                showLargestPW ? "active" : ""
+              }`}
+              onClick={() => setShowLargestPW(true)}
+            >
+              Show Largest PW
+            </button>
+            <button
+              className={`btn btn-outline-secondary ${
+                !showLargestPW ? "active" : ""
+              }`}
+              onClick={() => setShowLargestPW(false)}
+            >
+              Hide Largest PW
+            </button>
+          </div>
         </div>
       </div>
 
@@ -316,6 +356,42 @@ function CW3WallChart({
             },
             hovertemplate: "Date: %{x}<br>CW: %{y:.0f}<extra></extra>",
           },
+          ...(showGammaFlip
+            ? [
+                {
+                  type: "scatter" as const,
+                  mode: "lines+markers" as const,
+                  x: wallPriceData.map((item) => item.date),
+                  y: wallPriceData.map((item) => item.gamma_flip),
+                  name: "Gamma Flip",
+                  line: {
+                    color: "#ffa500",
+                    width: 2,
+                    dash: "dot" as const,
+                  },
+                  hovertemplate:
+                    "Date: %{x}<br>Gamma Flip: %{y:.0f}<extra></extra>",
+                },
+              ]
+            : []),
+          ...(showLargestPW
+            ? [
+                {
+                  type: "scatter" as const,
+                  mode: "lines+markers" as const,
+                  x: wallPriceData.map((item) => item.date),
+                  y: wallPriceData.map((item) => item.pw3),
+                  name: "Largest Put Wall",
+                  line: {
+                    color: "#6f42c1",
+                    width: 2,
+                    dash: "dot" as const,
+                  },
+                  hovertemplate:
+                    "Date: %{x}<br>Largest Put Wall: %{y:.0f}<extra></extra>",
+                },
+              ]
+            : []),
           {
             type: "candlestick",
             x: wallPriceData.map((item) => item.date),
