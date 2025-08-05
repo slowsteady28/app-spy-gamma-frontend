@@ -14,6 +14,10 @@ interface CandleData {
   category?: number;
 }
 
+interface SPYHourlyChartProps {
+  lookback: number;
+}
+
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 const categoryColors: { [key: number]: string } = {
@@ -29,13 +33,13 @@ const categoryColors: { [key: number]: string } = {
   10: "#B71C1C", // down >4
 };
 
-const SPYHourlyChart: React.FC = () => {
+const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
   const [data, setData] = useState<CandleData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios
-      .get(`${apiBaseUrl}/hourly-spy-price-data?lookback=9999`)
+      .get(`${apiBaseUrl}/hourly-spy-price-data?lookback=${lookback}`)
       .then((res) => {
         const rawData: CandleData[] = res.data;
 
