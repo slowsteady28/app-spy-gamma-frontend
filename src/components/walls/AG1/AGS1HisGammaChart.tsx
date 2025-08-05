@@ -37,6 +37,7 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
           `${apiBaseUrl}/data/ags1-history?lookback=${lookback}`
         );
         const rawData = response.data;
+        console.log(rawData);
 
         type CandleDataPoint = {
           date: string;
