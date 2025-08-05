@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
 import axios from "axios";
+import { Layout, CandlestickData } from "plotly.js";
 
 interface CandleData {
   Date: string;
@@ -16,16 +17,16 @@ interface CandleData {
 const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 const categoryColors: { [key: number]: string } = {
-  1: "#C8E6C9", // up 0-1 light green
+  1: "#C8E6C9", // up 0-1
   2: "#A5D6A7", // up 1-2
   3: "#81C784", // up 2-3
   4: "#4CAF50", // up 3-4
-  5: "#2E7D32", // up > 4
-  6: "#FFCDD2", // down 0-1 light red
+  5: "#2E7D32", // up >4
+  6: "#FFCDD2", // down 0-1
   7: "#EF9A9A", // down 1-2
   8: "#E57373", // down 2-3
   9: "#F44336", // down 3-4
-  10: "#B71C1C", // down > 4
+  10: "#B71C1C", // down >4
 };
 
 const SPYHourlyChart: React.FC = () => {
@@ -37,6 +38,7 @@ const SPYHourlyChart: React.FC = () => {
       .get(`${apiBaseUrl}/hourly-spy-price-data?lookback=9999`)
       .then((res) => {
         const rawData: CandleData[] = res.data;
+
         const categorized = rawData.map((d) => {
           const isUpClose = d["SPY CLOSE"] > d["SPY OPEN"];
           const z = parseFloat(d["Volume Z-Score"] as any);
@@ -73,24 +75,22 @@ const SPYHourlyChart: React.FC = () => {
 
   if (loading) return <div>Loading...</div>;
 
-  const traces = data.map((d, i) => {
-    return {
-      type: "candlestick",
-      x: [`${d.Date} ${d.Time}`],
-      open: [d["SPY OPEN"]],
-      high: [d["SPY HIGH"]],
-      low: [d["SPY LOW"]],
-      close: [d["SPY CLOSE"]],
-      name: "",
-      increasing: {
-        line: { color: categoryColors[d.category || 0] || "#ffffff" },
-      },
-      decreasing: {
-        line: { color: categoryColors[d.category || 0] || "#ffffff" },
-      },
-      showlegend: false,
-    };
-  });
+  const traces: Partial<CandlestickData>[] = data.map((d) => ({
+    type: "candlestick",
+    x: [`${d.Date} ${d.Time}`],
+    open: [d["SPY OPEN"]],
+    high: [d["SPY HIGH"]],
+    low: [d["SPY LOW"]],
+    close: [d["SPY CLOSE"]],
+    name: "",
+    increasing: {
+      line: { color: categoryColors[d.category || 0] || "#ffffff" },
+    },
+    decreasing: {
+      line: { color: categoryColors[d.category || 0] || "#ffffff" },
+    },
+    showlegend: false,
+  }));
 
   const layout: Partial<Layout> = {
     margin: { l: 55, r: 40, t: 80, b: 140 },
@@ -119,22 +119,7 @@ const SPYHourlyChart: React.FC = () => {
     height: 800,
     plot_bgcolor: "#212529",
     paper_bgcolor: "#212529",
-    shapes: [
-      {
-        type: "circle",
-        xref: "x",
-        yref: "y",
-        x0: "07-07-2025 09:30:00",
-        x1: "07-07-2025 11:30:00",
-        y0: 621.5,
-        y1: 623.5,
-        fillcolor: "rgba(0, 0, 255, 0.1)",
-        line: { width: 0 },
-      },
-    ],
   };
-
-  if (loading) return <div className="p-4">Loading hourly SPY chart...</div>;
 
   return (
     <Plot

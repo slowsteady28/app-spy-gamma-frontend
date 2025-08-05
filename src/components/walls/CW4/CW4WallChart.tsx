@@ -274,7 +274,7 @@ function CW4WallChart({
             color: "#212529",
           }}
         >
-          2nd LARGEST CALL WALL
+          4TH LARGEST CALL WALL
         </h4>
         <div className="d-flex justify-content-end mb-2 me-2">
           <div
