@@ -185,7 +185,13 @@ const CW1AppReady = () => {
                   >
                     <Col
                       xs={12}
-                      style={{ background: "transparent", padding: 0 }}
+                      style={{
+                        background: "#111", // optional: darker background for contrast
+                        padding: 0,
+                        borderRadius: "12px", // curved edges
+                        overflow: "hidden", // clip the chart to the curve
+                        boxShadow: "0 0 20px rgba(11, 55, 59, 0.6)", // glow
+                      }}
                     >
                       <SPYHourlyChart lookback={lookback} />
                     </Col>
