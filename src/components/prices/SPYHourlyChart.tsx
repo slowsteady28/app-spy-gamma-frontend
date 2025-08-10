@@ -3,6 +3,8 @@ import Plot from "react-plotly.js";
 import axios from "axios";
 import { Layout, CandlestickData, Shape, PlotData } from "plotly.js";
 
+const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 interface CandleData {
   Date: string;
   Time: string;
@@ -16,12 +18,15 @@ interface CandleData {
   "Range (High - Low) Z-Score": number;
   CW1?: number;
   "Percentile Z-Score CW Gamma (Net) CW1"?: number;
+  durationD?: number; // Percentile Z-Score Ave Length CW1 (0..1)
 }
 
 // Color constants
 const CW1_DEFAULT = "#33C3F0"; // blue
 const CW1_NEON_GREEN = "#39FF14"; // neon green
 const CW1_REDDISH = "#FFCDD2"; // soft reddish
+const NEON_VIOLET = "#9D00FF"; // neon violet ring (low D)
+const NEON_ORANGE = "#FFAE00"; // neon orange ring (high D)
 
 const getCW1Color = (p?: number) => {
   if (p == null || Number.isNaN(p)) return CW1_DEFAULT;
@@ -31,10 +36,8 @@ const getCW1Color = (p?: number) => {
 };
 
 interface SPYHourlyChartProps {
-  lookback: number;
+  lookback: number; // number of trading days to show (25/50/100/200/400)
 }
-
-const apiBaseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 const categoryColors: { [key: number]: string } = {
   1: "#333333", // up 0-1
@@ -75,16 +78,23 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
       .get(`${apiBaseUrl}/hourly-spy-price-data?lookback=${lookback}`)
       .then((res) => {
         const rawData: CandleData[] = res.data;
-        console.log("Raw SPY data:", rawData);
+
+        // Normalize/derive fields
         const categorized = rawData.map((d) => {
           const isUpClose = d["SPY CLOSE"] >= d["SPY OPEN"];
           const volumeZ = parseFloat(d["Volume Z-Score"] as any);
           const rangeZ = parseFloat(d["Range (Open - Close) Z-Score"] as any);
           const rangeX = parseFloat(d["Range (High - Low) Z-Score"] as any);
-          let category = 0;
+
+          // Parse percentile fields
           const percentile = parseFloat(
             (d as any)["Percentile Z-Score CW Gamma (Net) CW1"] as any
           );
+          const durationD = parseFloat(
+            (d as any)["Percentile Z-Score Ave Length CW1"] as any
+          ); // 0..1 percentile fraction
+
+          let category = 0;
 
           // Volume Z-Score categories
           if (isUpClose) {
@@ -125,23 +135,45 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
             ...d,
             category,
             "Percentile Z-Score CW Gamma (Net) CW1": percentile,
+            durationD,
           };
         });
 
+        // Sort by datetime ASC
         const sorted = categorized.sort(
           (a, b) =>
             new Date(`${a.Date} ${a.Time}`).getTime() -
             new Date(`${b.Date} ${b.Time}`).getTime()
         );
 
-        setData(sorted);
+        // --- CLIENT-SIDE LOOKBACK (by trading days) ---
+        // Build ordered list of unique dates from sorted rows
+        const uniqueDates: string[] = [];
+        for (const row of sorted) {
+          if (
+            uniqueDates.length === 0 ||
+            uniqueDates[uniqueDates.length - 1] !== row.Date
+          ) {
+            uniqueDates.push(row.Date);
+          }
+        }
+
+        // Keep only the last {lookback} dates
+        const allowedDates = new Set(
+          uniqueDates.slice(-Math.max(1, lookback)) // guard against zero/negative
+        );
+
+        const filtered = sorted.filter((row) => allowedDates.has(row.Date));
+        setData(filtered);
       })
       .catch((err) => console.error("Error fetching hourly SPY data", err))
       .finally(() => setLoading(false));
-  }, [lookback]); // ✅ include prop so we refetch on change
+  }, [lookback]);
 
   if (loading) return <div>Loading...</div>;
+  if (!data.length) return <div>No data</div>;
 
+  // Build candlestick traces (one per bar)
   const traces: Partial<CandlestickData>[] = data.map((d) => ({
     type: "candlestick",
     x: [`${d.Date} ${d.Time}`],
@@ -163,7 +195,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     showlegend: false,
   }));
 
-  // Unique CW1 per date + its percentile
+  // Unique CW1 per date + its percentile (first seen per day in filtered data)
   const cw1ShapesMap: { [date: string]: { cw1: number; p?: number } } = {};
   data.forEach((d) => {
     if (typeof d.CW1 === "number" && !(d.Date in cw1ShapesMap)) {
@@ -174,9 +206,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     }
   });
 
-  console.log("CW1 shapes map:", cw1ShapesMap);
-
-  // Start/end times per date
+  // Per-date start/end times (span of the trading day in the filtered dataset)
   const timeRangeMap: { [date: string]: { start: string; end: string } } = {};
   data.forEach((d) => {
     if (!timeRangeMap[d.Date]) {
@@ -197,26 +227,104 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     }
   });
 
-  // Horizontal CW1 per day with dynamic color
-  const shapes: Partial<Shape>[] = Object.entries(cw1ShapesMap)
-    .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
+  // Daily min/max (filtered)
+  const dailyPriceRange: {
+    [date: string]: { minLow: number; maxHigh: number };
+  } = {};
+  data.forEach((d) => {
+    const cur = dailyPriceRange[d.Date];
+    if (!cur) {
+      dailyPriceRange[d.Date] = {
+        minLow: d["SPY LOW"],
+        maxHigh: d["SPY HIGH"],
+      };
+    } else {
+      if (d["SPY LOW"] < cur.minLow) cur.minLow = d["SPY LOW"];
+      if (d["SPY HIGH"] > cur.maxHigh) cur.maxHigh = d["SPY HIGH"];
+    }
+  });
+
+  // Identify days to ring based on first bar in filtered data
+  // - Low Duration (<= 11th percentile): NEON_VIOLET
+  // - High Duration (>= 89th percentile): NEON_ORANGE
+  const dayNeedsRingLowD = new Set<string>();
+  const dayNeedsRingHighD = new Set<string>();
+  const seenFirstBar = new Set<string>();
+
+  for (const d of data) {
+    if (!seenFirstBar.has(d.Date)) {
+      seenFirstBar.add(d.Date);
+      const D = d.durationD;
+      if (Number.isFinite(D) && (D as number) <= 0.11)
+        dayNeedsRingLowD.add(d.Date);
+      if (Number.isFinite(D) && (D as number) >= 0.89)
+        dayNeedsRingHighD.add(d.Date);
+    }
+  }
+
+  // CW1 daily horizontal line shapes (color by percentile)
+  const cw1DailyShapes: Partial<Shape>[] = Object.entries(cw1ShapesMap)
+    .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
     .map(([date, { cw1, p }]) => {
-      const timeRange = timeRangeMap[date];
-      if (!timeRange) return null;
+      const tr = timeRangeMap[date];
+      if (!tr) return null;
       return {
         type: "line",
         xref: "x",
         yref: "y",
-        x0: `${date} ${timeRange.start}`,
-        x1: `${date} ${timeRange.end}`,
+        x0: `${date} ${tr.start}`,
+        x1: `${date} ${tr.end}`,
         y0: cw1,
         y1: cw1,
         line: { color: getCW1Color(p), width: 2, dash: "solid" },
-      };
+      } as Partial<Shape>;
     })
     .filter(Boolean) as Partial<Shape>[];
 
-  // ONE definition of cw1LineData (with percentile)
+  // Neon rings around the day's candles
+  const buildDayRings = (
+    dates: Set<string>,
+    color: string
+  ): Partial<Shape>[] => {
+    const rings: Partial<Shape>[] = [];
+    for (const date of dates) {
+      const tr = timeRangeMap[date];
+      const pr = dailyPriceRange[date];
+      if (!tr || !pr) continue;
+
+      const yMin = pr.minLow;
+      const yMax = pr.maxHigh;
+      const pad = (yMax - yMin) * 0.02 || 0.1;
+      const y0 = Math.max(0, yMin - pad);
+      const y1 = yMax + pad;
+
+      rings.push({
+        type: "rect",
+        xref: "x",
+        yref: "y",
+        x0: `${date} ${tr.start}`,
+        x1: `${date} ${tr.end}`,
+        y0,
+        y1,
+        line: { color, width: 2 },
+        fillcolor: "rgba(0,0,0,0)", // pure ring; change alpha if you want a halo
+        layer: "above",
+      });
+    }
+    return rings;
+  };
+
+  const dayRingsLowD = buildDayRings(dayNeedsRingLowD, NEON_VIOLET);
+  const dayRingsHighD = buildDayRings(dayNeedsRingHighD, NEON_ORANGE);
+
+  // Combine shapes
+  const shapes: Partial<Shape>[] = [
+    ...cw1DailyShapes,
+    ...dayRingsLowD,
+    ...dayRingsHighD,
+  ];
+
+  // CW1 line data (x,y,p) for colored segments + connector
   const cw1LineData = data
     .filter((d) => typeof d.CW1 === "number")
     .map((d) => ({
@@ -225,6 +333,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
       p: d["Percentile Z-Score CW Gamma (Net) CW1"],
     }));
 
+  // Connector line for continuity
   const cw1Connector: Partial<PlotData> = {
     type: "scatter",
     mode: "lines",
@@ -244,13 +353,13 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     type: "scatter",
     mode: "lines+markers",
     name: label,
-    // If TS complains about nulls later, add `as any` to x/y lines:
     x: cw1LineData.map((d) => (predicate(d.p) ? d.x : null)) as any,
     y: cw1LineData.map((d) => (predicate(d.p) ? d.y : null)) as any,
     line: { color, width: 1, dash: "dot" },
     marker: { size: 4, color },
-    hoverinfo: "x+y+name" as const, // 👈 keep it a literal, not string
+    hoverinfo: "x+y+name" as const,
     connectgaps: false,
+    showlegend: false,
   });
 
   const cw1High = makeCw1Trace(
@@ -286,18 +395,27 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
       dtick: 200,
       rangeslider: { visible: false },
       visible: false,
+      showspikes: true,
+      spikemode: "across",
+      spikesnap: "cursor",
+      spikedash: "solid",
+      spikethickness: 1,
+      spikecolor: "#888",
     },
     yaxis: {
       color: "#FFFFFF",
       type: "log",
       autorange: true,
       fixedrange: false,
+      showspikes: true,
+      spikemode: "across",
+      spikedash: "solid",
     },
     autosize: true,
     height: 800,
     plot_bgcolor: "#212529",
     paper_bgcolor: "#212529",
-    shapes, // include CW1 daily horizontal lines
+    shapes,
   };
 
   return (
