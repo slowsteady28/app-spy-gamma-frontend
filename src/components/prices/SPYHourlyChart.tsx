@@ -21,56 +21,80 @@ interface CandleData {
   durationD?: number; // Percentile Z-Score Ave Length CW1 (0..1)
 }
 
-// Color constants
-const CW1_DEFAULT = "#33C3F0"; // blue
-const CW1_NEON_GREEN = "#39FF14"; // neon green
-const CW1_REDDISH = "#FFCDD2"; // soft reddish
-const NEON_VIOLET = "#9D00FF"; // neon violet ring (low D)
-const NEON_ORANGE = "#FFAE00"; // neon orange ring (high D)
-
-const getCW1Color = (p?: number) => {
-  if (p == null || Number.isNaN(p)) return CW1_DEFAULT;
-  if (p >= 0.89) return CW1_NEON_GREEN;
-  if (p <= 0.11) return CW1_REDDISH;
-  return CW1_DEFAULT;
-};
+// Colors
+const CW1_DEFAULT = "#33C3F0";
+const CW1_NEON_GREEN = "#39FF14";
+const CW1_REDDISH = "#FFCDD2";
+const NEON_VIOLET = "#9D00FF"; // Duration low-ring
+const NEON_ORANGE = "#FFAE00"; // Duration high-ring
 
 interface SPYHourlyChartProps {
-  lookback: number; // number of trading days to show (25/50/100/200/400)
+  lookback: number; // 25 | 50 | 100 | 200 | 400
 }
 
 const categoryColors: { [key: number]: string } = {
-  1: "#333333", // up 0-1
-  2: "#A5D6A7", // up 1-2
-  3: "#81C784", // up 2-3
-  4: "#4CAF50", // up 3-4
-  5: "#2E7D32", // up >4
-
-  6: "#333333", // down 0-1
-  7: "#EF9A9A", // down 1-2
-  8: "#E57373", // down 2-3
-  9: "#F44336", // down 3-4
-  10: "#B71C1C", // down >4
-
-  11: "#333333", // up -1 to 0
-  12: "#e5ed47", // up -2 to -1
-  13: "#e5ed47", // up -3 to -2
-  14: "#e0eb0c", // up -4 to -3
-  15: "#e0eb0c", // up < -4
-
-  16: "#333333", // down -1 to 0
-  17: "#e5ed47", // down -2 to -1
-  18: "#e5ed47", // down -3 to -2
-  19: "#e0eb0c", // down -4 to -3
-  20: "#e0eb0c", // down < -4
-
-  21: "#1BFFFF", // neon blue for small body candles
-  22: "#1BFFFF", // neon blue for small range candles
+  1: "#333333",
+  2: "#A5D6A7",
+  3: "#81C784",
+  4: "#4CAF50",
+  5: "#2E7D32",
+  6: "#333333",
+  7: "#EF9A9A",
+  8: "#E57373",
+  9: "#F44336",
+  10: "#B71C1C",
+  11: "#333333",
+  12: "#e5ed47",
+  13: "#e5ed47",
+  14: "#e0eb0c",
+  15: "#e0eb0c",
+  16: "#333333",
+  17: "#e5ed47",
+  18: "#e5ed47",
+  19: "#e0eb0c",
+  20: "#e0eb0c",
+  21: "#1BFFFF",
+  22: "#1BFFFF",
 };
+
+type DurationMode = "low" | "high" | "both";
 
 const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
   const [data, setData] = useState<CandleData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // UI state for controls
+  const [showCallWall, setShowCallWall] = useState(true);
+  const [percentileLow, setPercentileLow] = useState(0.11); // ≤ low -> red
+  const [percentileHigh, setPercentileHigh] = useState(0.89); // ≥ high -> green
+
+  const [showDurationRings, setShowDurationRings] = useState(true);
+  const [durationMode, setDurationMode] = useState<DurationMode>("both");
+  const [durationLow, setDurationLow] = useState(0.11); // D ≤ low -> violet ring
+  const [durationHigh, setDurationHigh] = useState(0.89); // D ≥ high -> orange ring
+
+  // Helpers to keep thresholds sane
+  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+  const onPercentileLow = (v: number) => {
+    const x = clamp01(v);
+    if (x >= percentileHigh) setPercentileHigh(Math.min(1, x + 0.01));
+    setPercentileLow(x);
+  };
+  const onPercentileHigh = (v: number) => {
+    const x = clamp01(v);
+    if (x <= percentileLow) setPercentileLow(Math.max(0, x - 0.01));
+    setPercentileHigh(x);
+  };
+  const onDurationLow = (v: number) => setDurationLow(clamp01(v));
+  const onDurationHigh = (v: number) => setDurationHigh(clamp01(v));
+
+  // Dynamic color function using current percentile thresholds
+  const colorForPercentile = (p?: number) => {
+    if (p == null || Number.isNaN(p)) return CW1_DEFAULT;
+    if (p >= percentileHigh) return CW1_NEON_GREEN;
+    if (p <= percentileLow) return CW1_REDDISH;
+    return CW1_DEFAULT;
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -79,24 +103,20 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
       .then((res) => {
         const rawData: CandleData[] = res.data;
 
-        // Normalize/derive fields
         const categorized = rawData.map((d) => {
           const isUpClose = d["SPY CLOSE"] >= d["SPY OPEN"];
           const volumeZ = parseFloat(d["Volume Z-Score"] as any);
           const rangeZ = parseFloat(d["Range (Open - Close) Z-Score"] as any);
           const rangeX = parseFloat(d["Range (High - Low) Z-Score"] as any);
 
-          // Parse percentile fields
           const percentile = parseFloat(
             (d as any)["Percentile Z-Score CW Gamma (Net) CW1"] as any
           );
           const durationD = parseFloat(
             (d as any)["Percentile Z-Score Ave Length CW1"] as any
-          ); // 0..1 percentile fraction
+          );
 
           let category = 0;
-
-          // Volume Z-Score categories
           if (isUpClose) {
             if (volumeZ >= 0 && volumeZ < 1) category = 1;
             else if (volumeZ >= 1 && volumeZ < 2) category = 2;
@@ -121,15 +141,8 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
             else if (volumeZ < -4) category = 20;
           }
 
-          // Small body override
-          if (rangeZ >= -0.02 && rangeZ <= 0.02) {
-            category = 21;
-          }
-
-          // Small range override
-          if (rangeX >= 1) {
-            category = 22;
-          }
+          if (rangeZ >= -0.02 && rangeZ <= 0.02) category = 21;
+          if (rangeX >= 1) category = 22;
 
           return {
             ...d,
@@ -139,15 +152,14 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
           };
         });
 
-        // Sort by datetime ASC
+        // Sort by datetime
         const sorted = categorized.sort(
           (a, b) =>
             new Date(`${a.Date} ${a.Time}`).getTime() -
             new Date(`${b.Date} ${b.Time}`).getTime()
         );
 
-        // --- CLIENT-SIDE LOOKBACK (by trading days) ---
-        // Build ordered list of unique dates from sorted rows
+        // Client-side lookback (by trading days)
         const uniqueDates: string[] = [];
         for (const row of sorted) {
           if (
@@ -157,13 +169,9 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
             uniqueDates.push(row.Date);
           }
         }
-
-        // Keep only the last {lookback} dates
-        const allowedDates = new Set(
-          uniqueDates.slice(-Math.max(1, lookback)) // guard against zero/negative
-        );
-
+        const allowedDates = new Set(uniqueDates.slice(-Math.max(1, lookback)));
         const filtered = sorted.filter((row) => allowedDates.has(row.Date));
+
         setData(filtered);
       })
       .catch((err) => console.error("Error fetching hourly SPY data", err))
@@ -173,7 +181,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
   if (loading) return <div>Loading...</div>;
   if (!data.length) return <div>No data</div>;
 
-  // Build candlestick traces (one per bar)
+  // Candlestick traces (one per bar)
   const traces: Partial<CandlestickData>[] = data.map((d) => ({
     type: "candlestick",
     x: [`${d.Date} ${d.Time}`],
@@ -195,7 +203,26 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     showlegend: false,
   }));
 
-  // Unique CW1 per date + its percentile (first seen per day in filtered data)
+  // Per-date start/end times
+  const timeRangeMap: { [date: string]: { start: string; end: string } } = {};
+  data.forEach((d) => {
+    if (!timeRangeMap[d.Date]) {
+      timeRangeMap[d.Date] = { start: d.Time, end: d.Time };
+    } else {
+      if (
+        new Date(`${d.Date} ${d.Time}`) <
+        new Date(`${d.Date} ${timeRangeMap[d.Date].start}`)
+      )
+        timeRangeMap[d.Date].start = d.Time;
+      if (
+        new Date(`${d.Date} ${d.Time}`) >
+        new Date(`${d.Date} ${timeRangeMap[d.Date].end}`)
+      )
+        timeRangeMap[d.Date].end = d.Time;
+    }
+  });
+
+  // Unique CW1 per date + percentile
   const cw1ShapesMap: { [date: string]: { cw1: number; p?: number } } = {};
   data.forEach((d) => {
     if (typeof d.CW1 === "number" && !(d.Date in cw1ShapesMap)) {
@@ -206,63 +233,49 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     }
   });
 
-  // Per-date start/end times (span of the trading day in the filtered dataset)
-  const timeRangeMap: { [date: string]: { start: string; end: string } } = {};
-  data.forEach((d) => {
-    if (!timeRangeMap[d.Date]) {
-      timeRangeMap[d.Date] = { start: d.Time, end: d.Time };
-    } else {
-      if (
-        new Date(`${d.Date} ${d.Time}`) <
-        new Date(`${d.Date} ${timeRangeMap[d.Date].start}`)
-      ) {
-        timeRangeMap[d.Date].start = d.Time;
-      }
-      if (
-        new Date(`${d.Date} ${d.Time}`) >
-        new Date(`${d.Date} ${timeRangeMap[d.Date].end}`)
-      ) {
-        timeRangeMap[d.Date].end = d.Time;
-      }
-    }
-  });
-
-  // Daily min/max (filtered)
+  // Daily min/max for rings
   const dailyPriceRange: {
     [date: string]: { minLow: number; maxHigh: number };
   } = {};
   data.forEach((d) => {
     const cur = dailyPriceRange[d.Date];
-    if (!cur) {
+    if (!cur)
       dailyPriceRange[d.Date] = {
         minLow: d["SPY LOW"],
         maxHigh: d["SPY HIGH"],
       };
-    } else {
+    else {
       if (d["SPY LOW"] < cur.minLow) cur.minLow = d["SPY LOW"];
       if (d["SPY HIGH"] > cur.maxHigh) cur.maxHigh = d["SPY HIGH"];
     }
   });
 
-  // Identify days to ring based on first bar in filtered data
-  // - Low Duration (<= 11th percentile): NEON_VIOLET
-  // - High Duration (>= 89th percentile): NEON_ORANGE
+  // Identify days to ring using duration thresholds + mode
   const dayNeedsRingLowD = new Set<string>();
   const dayNeedsRingHighD = new Set<string>();
   const seenFirstBar = new Set<string>();
-
   for (const d of data) {
     if (!seenFirstBar.has(d.Date)) {
       seenFirstBar.add(d.Date);
       const D = d.durationD;
-      if (Number.isFinite(D) && (D as number) <= 0.11)
-        dayNeedsRingLowD.add(d.Date);
-      if (Number.isFinite(D) && (D as number) >= 0.89)
-        dayNeedsRingHighD.add(d.Date);
+      if (Number.isFinite(D)) {
+        if (
+          (durationMode === "low" || durationMode === "both") &&
+          (D as number) <= durationLow
+        ) {
+          dayNeedsRingLowD.add(d.Date);
+        }
+        if (
+          (durationMode === "high" || durationMode === "both") &&
+          (D as number) >= durationHigh
+        ) {
+          dayNeedsRingHighD.add(d.Date);
+        }
+      }
     }
   }
 
-  // CW1 daily horizontal line shapes (color by percentile)
+  // CW1 daily horizontal line shapes (color reacts to sliders)
   const cw1DailyShapes: Partial<Shape>[] = Object.entries(cw1ShapesMap)
     .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
     .map(([date, { cw1, p }]) => {
@@ -276,12 +289,12 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
         x1: `${date} ${tr.end}`,
         y0: cw1,
         y1: cw1,
-        line: { color: getCW1Color(p), width: 2, dash: "solid" },
+        line: { color: colorForPercentile(p), width: 2, dash: "solid" },
       } as Partial<Shape>;
     })
     .filter(Boolean) as Partial<Shape>[];
 
-  // Neon rings around the day's candles
+  // Build duration rings
   const buildDayRings = (
     dates: Set<string>,
     color: string
@@ -295,7 +308,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
       const yMin = pr.minLow;
       const yMax = pr.maxHigh;
       const pad = (yMax - yMin) * 0.02 || 0.1;
-      const y0 = Math.max(0, yMin - pad);
+      const y0 = Math.max(0.000001, yMin - pad); // log axis safe
       const y1 = yMax + pad;
 
       rings.push({
@@ -307,24 +320,28 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
         y0,
         y1,
         line: { color, width: 2 },
-        fillcolor: "rgba(0,0,0,0)", // pure ring; change alpha if you want a halo
+        fillcolor: "rgba(0,0,0,0)",
         layer: "above",
       });
     }
     return rings;
   };
 
-  const dayRingsLowD = buildDayRings(dayNeedsRingLowD, NEON_VIOLET);
-  const dayRingsHighD = buildDayRings(dayNeedsRingHighD, NEON_ORANGE);
+  const dayRingsLowD = showDurationRings
+    ? buildDayRings(dayNeedsRingLowD, NEON_VIOLET)
+    : [];
+  const dayRingsHighD = showDurationRings
+    ? buildDayRings(dayNeedsRingHighD, NEON_ORANGE)
+    : [];
 
   // Combine shapes
   const shapes: Partial<Shape>[] = [
-    ...cw1DailyShapes,
+    ...(showCallWall ? cw1DailyShapes : []),
     ...dayRingsLowD,
     ...dayRingsHighD,
   ];
 
-  // CW1 line data (x,y,p) for colored segments + connector
+  // CW1 line data for colored bands + connector (bands react to sliders)
   const cw1LineData = data
     .filter((d) => typeof d.CW1 === "number")
     .map((d) => ({
@@ -333,7 +350,6 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
       p: d["Percentile Z-Score CW Gamma (Net) CW1"],
     }));
 
-  // Connector line for continuity
   const cw1Connector: Partial<PlotData> = {
     type: "scatter",
     mode: "lines",
@@ -363,21 +379,22 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
   });
 
   const cw1High = makeCw1Trace(
-    "CW1 ≥ 89th pct",
+    `CW1 ≥ ${(percentileHigh * 100).toFixed(0)}th pct`,
     CW1_NEON_GREEN,
-    (p) => (p ?? -1) >= 0.89
+    (p) => (p ?? -1) >= percentileHigh
   );
   const cw1Low = makeCw1Trace(
-    "CW1 ≤ 11th pct",
+    `CW1 ≤ ${(percentileLow * 100).toFixed(0)}th pct`,
     CW1_REDDISH,
-    (p) => (p ?? 1) <= 0.11
+    (p) => (p ?? 1) <= percentileLow
   );
   const cw1Mid = makeCw1Trace(
-    "CW1",
+    `CW1 mid`,
     CW1_DEFAULT,
-    (p) => p != null && p > 0.11 && p < 0.89
+    (p) => p != null && p > percentileLow && p < percentileHigh
   );
 
+  // Layout
   const layout: Partial<Layout> = {
     margin: { l: 55, r: 40, t: 80, b: 10 },
     dragmode: "zoom",
@@ -418,21 +435,179 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     shapes,
   };
 
-  return (
-    <Plot
-      data={[...traces, cw1Connector, cw1High, cw1Mid, cw1Low]}
-      layout={{ ...layout, shapes }}
-      useResizeHandler
-      style={{ width: "100%", height: "100%" }}
-      config={{
-        responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        editable: true,
-        modeBarButtonsToAdd: ["drawline", "eraseshape"] as any,
-        modeBarButtonsToRemove: ["zoom2d", "select2d", "lasso2d"],
+  // Build Plot data with toggles
+  const plotSeries: Partial<PlotData | CandlestickData>[] = [...traces];
+  if (showCallWall) {
+    plotSeries.push(cw1Connector, cw1High, cw1Mid, cw1Low);
+  }
+
+  // Control panel (simple HTML controls; no extra deps)
+  const controls = (
+    <div
+      style={{
+        marginTop: 8,
+        background: "rgba(17,17,17,0.85)",
+        border: "1px solid #0096b4",
+        borderRadius: 8,
+        padding: "10px 12px",
+        color: "#fff",
+        fontSize: 12,
+        minWidth: 260,
+        boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+        backdropFilter: "blur(2px)",
       }}
-    />
+    >
+      <div style={{ fontWeight: 700, marginBottom: 8 }}>Overlays</div>
+
+      <div style={{ display: "grid", gap: 8 }}>
+        {/* CW1 Percentile */}
+        <div style={{ borderBottom: "1px solid #2a2a2a", paddingBottom: 8 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={showCallWall}
+              onChange={(e) => setShowCallWall(e.target.checked)}
+            />
+            <span>
+              Show Call Wall overlays (bands + connector + daily line)
+            </span>
+          </label>
+
+          <div style={{ marginTop: 8, opacity: showCallWall ? 1 : 0.5 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Low threshold</span>
+              <strong>{(percentileLow * 100).toFixed(0)}%</strong>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={percentileLow}
+              onChange={(e) => onPercentileLow(parseFloat(e.target.value))}
+              style={{ width: "100%" }}
+              disabled={!showCallWall}
+            />
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: 6,
+              }}
+            >
+              <span>High threshold</span>
+              <strong>{(percentileHigh * 100).toFixed(0)}%</strong>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={percentileHigh}
+              onChange={(e) => onPercentileHigh(parseFloat(e.target.value))}
+              style={{ width: "100%" }}
+              disabled={!showCallWall}
+            />
+          </div>
+        </div>
+
+        {/* Duration Rings */}
+        <div>
+          <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={showDurationRings}
+              onChange={(e) => setShowDurationRings(e.target.checked)}
+            />
+            <span>Show Duration rings</span>
+          </label>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginTop: 6,
+            }}
+          >
+            <span style={{ whiteSpace: "nowrap" }}>Mode</span>
+            <select
+              value={durationMode}
+              onChange={(e) => setDurationMode(e.target.value as DurationMode)}
+              style={{
+                flex: 1,
+                background: "#111",
+                color: "#fff",
+                border: "1px solid #444",
+                borderRadius: 6,
+                padding: "2px 6px",
+              }}
+            >
+              <option value="both">Both</option>
+              <option value="low">Low only</option>
+              <option value="high">High only</option>
+            </select>
+          </div>
+
+          <div style={{ marginTop: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Low D ≤</span>
+              <strong>{(durationLow * 100).toFixed(0)}%</strong>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={durationLow}
+              onChange={(e) => onDurationLow(parseFloat(e.target.value))}
+              style={{ width: "100%" }}
+            />
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: 6,
+              }}
+            >
+              <span>High D ≥</span>
+              <strong>{(durationHigh * 100).toFixed(0)}%</strong>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={durationHigh}
+              onChange={(e) => onDurationHigh(parseFloat(e.target.value))}
+              style={{ width: "100%" }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ position: "relative" }}>
+      <Plot
+        data={plotSeries}
+        layout={{ ...layout, shapes }}
+        useResizeHandler
+        style={{ width: "100%", height: "100%" }}
+        config={{
+          responsive: true,
+          displayModeBar: true,
+          displaylogo: false,
+          editable: true,
+          modeBarButtonsToAdd: ["drawline", "eraseshape"] as any,
+          modeBarButtonsToRemove: ["zoom2d", "select2d", "lasso2d"],
+        }}
+      />
+      <div> {controls}</div>
+    </div>
   );
 };
 
