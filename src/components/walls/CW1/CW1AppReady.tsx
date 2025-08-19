@@ -7,7 +7,8 @@ import CW1NetOIChart from "./CW1NetOIChart";
 import CW1NetGammaChart from "./CW1NetGammaChart";
 import CW1DurationChart from "./CW1DurationChart";
 import ChartSkeleton from "../utils/ChartSkeleton";
-import SPYHourlyChart from "../../prices/SPYHourlyChart";
+import SPYHourlyChart from "../../charts/CW1SPYHourlyChart";
+import CW1LowNetCallGamma from "../../playbooks/CW1LowNetCallGamma";
 
 const mainColor = "#0096b4";
 const priceColor = "#212529";
@@ -188,7 +189,7 @@ const CW1AppReady = () => {
                       style={{
                         background: "#111", // optional: darker background for contrast
                         padding: 0,
-                        borderRadius: "12px", // curved edges
+                        borderRadius: "8px", // curved edges
                         overflow: "hidden", // clip the chart to the curve
                         boxShadow: "0 0 20px rgba(11, 55, 59, 0.6)", // glow
                       }}
@@ -196,6 +197,25 @@ const CW1AppReady = () => {
                       <SPYHourlyChart lookback={lookback} />
                     </Col>
                   </Row>
+
+                  <Row
+                    className="g-0"
+                    style={{ background: "transparent", margin: 0 }}
+                  >
+                    <Col
+                      xs={12}
+                      style={{
+                        background: "#111", // optional: darker background for contrast
+                        padding: 0,
+                        borderRadius: "10px", // curved edges
+                        overflow: "hidden", // clip the chart to the curve
+                        boxShadow: "0 0 20px rgba(11, 55, 59, 0.6)", // glow
+                      }}
+                    >
+                      <CW1LowNetCallGamma />
+                    </Col>
+                  </Row>
+                  {/* */}
 
                   <Row
                     className="g-0"

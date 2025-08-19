@@ -24,7 +24,6 @@ import AGS1AppReady from "../components/walls/AG1/AGS1AppReady";
 import AGS2AppReady from "../components/walls/AG2/AGS2AppReady";
 import AGS3AppReady from "../components/walls/AG3/AGS3AppReady";
 
-import GammaFlip from "../components/regime/GammaFlip";
 import CW1LongTermExp from "../components/expirations/CW1GammaExpAppReady";
 
 import Register from "./page_auth/Register";
@@ -202,14 +201,6 @@ function Dashboard() {
                   />
                 );
               })}
-              <Route
-                path="/gamma-flip"
-                element={
-                  <ProtectedRoute>
-                    <GammaFlip />
-                  </ProtectedRoute>
-                }
-              />
               <Route
                 path="/cw1-top-3-expirations"
                 element={
