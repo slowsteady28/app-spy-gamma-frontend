@@ -7,6 +7,7 @@ import CW5NetOIChart from "./CW5NetOIChart";
 import CW5NetGammaChart from "./CW5NetGammaChart";
 import CW5DurationChart from "./CW5DurationChart";
 import ChartSkeleton from "../utils/ChartSkeleton";
+import SPYHourlyChart from "../../charts/CW5SPYHourlyChart";
 
 const mainColor = "#0096b4";
 const priceColor = "#212529";
@@ -175,6 +176,23 @@ const CW5AppReady = () => {
                       style={{ background: "transparent", padding: 0 }}
                     >
                       <CW5DurationChart lookback={lookback} />
+                    </Col>
+                  </Row>
+                  <Row
+                    className="g-0"
+                    style={{ background: "transparent", margin: 0 }}
+                  >
+                    <Col
+                      xs={12}
+                      style={{
+                        background: "#111", // optional: darker background for contrast
+                        padding: 0,
+                        borderRadius: "8px", // curved edges
+                        overflow: "hidden", // clip the chart to the curve
+                        boxShadow: "0 0 20px rgba(11, 55, 59, 0.6)", // glow
+                      }}
+                    >
+                      <SPYHourlyChart lookback={lookback} />
                     </Col>
                   </Row>
                 </Card.Body>

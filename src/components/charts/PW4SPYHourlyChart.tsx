@@ -16,15 +16,15 @@ interface CandleData {
   category?: number;
   "Range (Open - Close) Z-Score": number;
   "Range (High - Low) Z-Score": number;
-  CW1?: number;
-  "Percentile Z-Score CW Gamma (Net) CW1"?: number;
-  durationD?: number; // Percentile Z-Score Ave Length CW1 (0..1)
+  PW4?: number;
+  "Percentile Z-Score CW Gamma (Net) PW4"?: number;
+  durationD?: number; // Percentile Z-Score Ave Length PW4 (0..1)
 }
 
 // Colors
-const CW1_DEFAULT = "#33C3F0";
-const CW1_NEON_GREEN = "#39FF14";
-const CW1_REDDISH = "#FFCDD2";
+const PW4_DEFAULT = "#6F42C1";
+const PW4_NEON_GREEN = "#39FF14";
+const PW4_REDDISH = "#FFCDD2";
 const NEON_VIOLET = "#9D00FF"; // Duration low-ring
 const NEON_ORANGE = "#FFAE00"; // Duration high-ring
 
@@ -90,10 +90,10 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
 
   // Dynamic color function using current percentile thresholds
   const colorForPercentile = (p?: number) => {
-    if (p == null || Number.isNaN(p)) return CW1_DEFAULT;
-    if (p >= percentileHigh) return CW1_NEON_GREEN;
-    if (p <= percentileLow) return CW1_REDDISH;
-    return CW1_DEFAULT;
+    if (p == null || Number.isNaN(p)) return PW4_DEFAULT;
+    if (p >= percentileHigh) return PW4_NEON_GREEN;
+    if (p <= percentileLow) return PW4_REDDISH;
+    return PW4_DEFAULT;
   };
 
   useEffect(() => {
@@ -102,8 +102,6 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
       .get(`${apiBaseUrl}/hourly-spy-price-data?lookback=${lookback}`)
       .then((res) => {
         const rawData: CandleData[] = res.data;
-        console.log(lookback);
-        console.log(res.data);
 
         const categorized = rawData.map((d) => {
           const isUpClose = d["SPY CLOSE"] >= d["SPY OPEN"];
@@ -112,10 +110,10 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
           const rangeX = parseFloat(d["Range (High - Low) Z-Score"] as any);
 
           const percentile = parseFloat(
-            (d as any)["Percentile Z-Score CW Gamma (Net) CW1"] as any
+            (d as any)["Percentile Z-Score CW Gamma (Net) PW4"] as any
           );
           const durationD = parseFloat(
-            (d as any)["Percentile Z-Score Ave Length CW1"] as any
+            (d as any)["Percentile Z-Score Ave Length PW4"] as any
           );
 
           let category = 0;
@@ -149,7 +147,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
           return {
             ...d,
             category,
-            "Percentile Z-Score CW Gamma (Net) CW1": percentile,
+            "Percentile Z-Score CW Gamma (Net) PW4": percentile,
             durationD,
           };
         });
@@ -224,13 +222,13 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     }
   });
 
-  // Unique CW1 per date + percentile
-  const cw1ShapesMap: { [date: string]: { cw1: number; p?: number } } = {};
+  // Unique PW4 per date + percentile
+  const Pw4ShapesMap: { [date: string]: { Pw4: number; p?: number } } = {};
   data.forEach((d) => {
-    if (typeof d.CW1 === "number" && !(d.Date in cw1ShapesMap)) {
-      cw1ShapesMap[d.Date] = {
-        cw1: d.CW1,
-        p: d["Percentile Z-Score CW Gamma (Net) CW1"],
+    if (typeof d.PW4 === "number" && !(d.Date in Pw4ShapesMap)) {
+      Pw4ShapesMap[d.Date] = {
+        Pw4: d.PW4,
+        p: d["Percentile Z-Score CW Gamma (Net) PW4"],
       };
     }
   });
@@ -277,10 +275,10 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     }
   }
 
-  // CW1 daily horizontal line shapes (color reacts to sliders)
-  const cw1DailyShapes: Partial<Shape>[] = Object.entries(cw1ShapesMap)
+  // PW4 daily horizontal line shapes (color reacts to sliders)
+  const Pw4DailyShapes: Partial<Shape>[] = Object.entries(Pw4ShapesMap)
     .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
-    .map(([date, { cw1, p }]) => {
+    .map(([date, { Pw4, p }]) => {
       const tr = timeRangeMap[date];
       if (!tr) return null;
       return {
@@ -289,8 +287,8 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
         yref: "y",
         x0: `${date} ${tr.start}`,
         x1: `${date} ${tr.end}`,
-        y0: cw1,
-        y1: cw1,
+        y0: Pw4,
+        y1: Pw4,
         line: { color: colorForPercentile(p), width: 2, dash: "solid" },
       } as Partial<Shape>;
     })
@@ -338,32 +336,32 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
 
   // Combine shapes
   const shapes: Partial<Shape>[] = [
-    ...(showCallWall ? cw1DailyShapes : []),
+    ...(showCallWall ? Pw4DailyShapes : []),
     ...dayRingsLowD,
     ...dayRingsHighD,
   ];
 
-  // CW1 line data for colored bands + connector (bands react to sliders)
-  const cw1LineData = data
-    .filter((d) => typeof d.CW1 === "number")
+  // PW4 line data for colored bands + connector (bands react to sliders)
+  const Pw4LineData = data
+    .filter((d) => typeof d.PW4 === "number")
     .map((d) => ({
       x: `${d.Date} ${d.Time}`,
-      y: d.CW1 as number,
-      p: d["Percentile Z-Score CW Gamma (Net) CW1"],
+      y: d.PW4 as number,
+      p: d["Percentile Z-Score CW Gamma (Net) PW4"],
     }));
 
-  const cw1Connector: Partial<PlotData> = {
+  const Pw4Connector: Partial<PlotData> = {
     type: "scatter",
     mode: "lines",
-    name: "CW1 connector",
-    x: cw1LineData.map((d) => d.x),
-    y: cw1LineData.map((d) => d.y),
-    line: { color: CW1_DEFAULT, width: 1 },
+    name: "PW4 connector",
+    x: Pw4LineData.map((d) => d.x),
+    y: Pw4LineData.map((d) => d.y),
+    line: { color: PW4_DEFAULT, width: 1 },
     hoverinfo: "skip" as const,
     showlegend: false,
   };
 
-  const makeCw1Trace = (
+  const makePw4Trace = (
     label: string,
     color: string,
     predicate: (p?: number) => boolean
@@ -371,8 +369,8 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     type: "scatter",
     mode: "lines+markers",
     name: label,
-    x: cw1LineData.map((d) => (predicate(d.p) ? d.x : null)) as any,
-    y: cw1LineData.map((d) => (predicate(d.p) ? d.y : null)) as any,
+    x: Pw4LineData.map((d) => (predicate(d.p) ? d.x : null)) as any,
+    y: Pw4LineData.map((d) => (predicate(d.p) ? d.y : null)) as any,
     line: { color, width: 1, dash: "dot" },
     marker: { size: 4, color },
     hoverinfo: "x+y+name" as const,
@@ -380,19 +378,19 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     showlegend: false,
   });
 
-  const cw1High = makeCw1Trace(
-    `CW1 ≥ ${(percentileHigh * 100).toFixed(0)}th pct`,
-    CW1_NEON_GREEN,
+  const Pw4High = makePw4Trace(
+    `PW4 ≥ ${(percentileHigh * 100).toFixed(0)}th pct`,
+    PW4_NEON_GREEN,
     (p) => (p ?? -1) >= percentileHigh
   );
-  const cw1Low = makeCw1Trace(
-    `CW1 ≤ ${(percentileLow * 100).toFixed(0)}th pct`,
-    CW1_REDDISH,
+  const Pw4Low = makePw4Trace(
+    `PW4 ≤ ${(percentileLow * 100).toFixed(0)}th pct`,
+    PW4_REDDISH,
     (p) => (p ?? 1) <= percentileLow
   );
-  const cw1Mid = makeCw1Trace(
-    `CW1 mid`,
-    CW1_DEFAULT,
+  const Pw4Mid = makePw4Trace(
+    `PW4 mid`,
+    PW4_DEFAULT,
     (p) => p != null && p > percentileLow && p < percentileHigh
   );
 
@@ -440,7 +438,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
   // Build Plot data with toggles
   const plotSeries: Partial<PlotData | CandlestickData>[] = [...traces];
   if (showCallWall) {
-    plotSeries.push(cw1Connector, cw1High, cw1Mid, cw1Low);
+    plotSeries.push(Pw4Connector, Pw4High, Pw4Mid, Pw4Low);
   }
 
   // Control panel (simple HTML controls; no extra deps)
@@ -462,7 +460,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
       <div style={{ fontWeight: 700, marginBottom: 8 }}>Overlays</div>
 
       <div style={{ display: "grid", gap: 8 }}>
-        {/* CW1 Percentile */}
+        {/* PW4 Percentile */}
         <div style={{ borderBottom: "1px solid #2a2a2a", paddingBottom: 8 }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <input

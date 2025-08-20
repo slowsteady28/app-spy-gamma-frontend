@@ -6,6 +6,7 @@ import PW4WallChart from "./PW4WallChart";
 import PW4NetOIChart from "./PW4NetOIChart";
 import PW4NetGammaChart from "./PW4NetGammaChart";
 import PW4DurationChart from "./PW4DurationChart";
+import SPYHourlyChart from "../../charts/PW4SPYHourlyChart";
 
 import ChartSkeleton from "../utils/ChartSkeleton";
 
@@ -176,6 +177,23 @@ const PW4AppReady = () => {
                       style={{ background: "transparent", padding: 0 }}
                     >
                       <PW4DurationChart lookback={lookback} />
+                    </Col>
+                  </Row>
+                  <Row
+                    className="g-0"
+                    style={{ background: "transparent", margin: 0 }}
+                  >
+                    <Col
+                      xs={12}
+                      style={{
+                        background: "#111", // optional: darker background for contrast
+                        padding: 0,
+                        borderRadius: "8px", // curved edges
+                        overflow: "hidden", // clip the chart to the curve
+                        boxShadow: "0 0 20px rgba(11, 55, 59, 0.6)", // glow
+                      }}
+                    >
+                      <SPYHourlyChart lookback={lookback} />
                     </Col>
                   </Row>
                 </Card.Body>

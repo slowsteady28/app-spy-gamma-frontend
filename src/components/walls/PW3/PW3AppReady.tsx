@@ -7,6 +7,7 @@ import PW3NetOIChart from "./PW3NetOIChart";
 import PW3NetGammaChart from "./PW3NetGammaChart";
 import PW3DurationChart from "./PW3DurationChart";
 import ChartSkeleton from "../utils/ChartSkeleton";
+import SPYHourlyChart from "../../charts/PW3SPYHourlyChart";
 
 const mainColor = "#6f42c1";
 const priceColor = "#212529";
@@ -175,6 +176,23 @@ const PW3AppReady = () => {
                       style={{ background: "transparent", padding: 0 }}
                     >
                       <PW3DurationChart lookback={lookback} />
+                    </Col>
+                  </Row>
+                  <Row
+                    className="g-0"
+                    style={{ background: "transparent", margin: 0 }}
+                  >
+                    <Col
+                      xs={12}
+                      style={{
+                        background: "#111", // optional: darker background for contrast
+                        padding: 0,
+                        borderRadius: "8px", // curved edges
+                        overflow: "hidden", // clip the chart to the curve
+                        boxShadow: "0 0 20px rgba(11, 55, 59, 0.6)", // glow
+                      }}
+                    >
+                      <SPYHourlyChart lookback={lookback} />
                     </Col>
                   </Row>
                 </Card.Body>
