@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import "./AppZoom.css"; // Import the CSS file
+import "./AppZoom.css";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 
 function App() {
