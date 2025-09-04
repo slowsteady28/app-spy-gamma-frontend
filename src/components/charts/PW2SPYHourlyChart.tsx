@@ -17,7 +17,7 @@ interface CandleData {
   "Range (Open - Close) Z-Score": number;
   "Range (High - Low) Z-Score": number;
   PW2?: number;
-  "Percentile Z-Score CW Gamma (Net) PW2"?: number;
+  "Percentile Z-Score PW Gamma (Net) PW2"?: number;
   durationD?: number; // Percentile Z-Score Ave Length PW2 (0..1)
 }
 
@@ -110,7 +110,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
           const rangeX = parseFloat(d["Range (High - Low) Z-Score"] as any);
 
           const percentile = parseFloat(
-            (d as any)["Percentile Z-Score CW Gamma (Net) PW2"] as any
+            (d as any)["Percentile Z-Score PW Gamma (Net) PW2"] as any
           );
           const durationD = parseFloat(
             (d as any)["Percentile Z-Score Ave Length PW2"] as any
@@ -147,7 +147,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
           return {
             ...d,
             category,
-            "Percentile Z-Score CW Gamma (Net) PW2": percentile,
+            "Percentile Z-Score PW Gamma (Net) PW2": percentile,
             durationD,
           };
         });
@@ -228,7 +228,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     if (typeof d.PW2 === "number" && !(d.Date in Pw2ShapesMap)) {
       Pw2ShapesMap[d.Date] = {
         Pw2: d.PW2,
-        p: d["Percentile Z-Score CW Gamma (Net) PW2"],
+        p: d["Percentile Z-Score PW Gamma (Net) PW2"],
       };
     }
   });
@@ -347,7 +347,7 @@ const SPYHourlyChart: React.FC<SPYHourlyChartProps> = ({ lookback }) => {
     .map((d) => ({
       x: `${d.Date} ${d.Time}`,
       y: d.PW2 as number,
-      p: d["Percentile Z-Score CW Gamma (Net) PW2"],
+      p: d["Percentile Z-Score PW Gamma (Net) PW2"],
     }));
 
   const Pw2Connector: Partial<PlotData> = {

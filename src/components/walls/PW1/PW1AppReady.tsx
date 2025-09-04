@@ -7,7 +7,7 @@ import PW1NetOIChart from "./PW1NetOIChart";
 import PW1NetGammaChart from "./PW1NetGammaChart";
 import PW1DurationChart from "./PW1DurationChart";
 import ChartSkeleton from "../utils/ChartSkeleton";
-import SPYHourlyChart from "../../charts/PW2SPYHourlyChart";
+import SPYHourlyChart from "../../charts/PW1SPYHourlyChart";
 
 const mainColor = "#6f42c1";
 const priceColor = "#212529";

@@ -15,13 +15,31 @@ type Props = {
   lookback: number;
 };
 
+type Row = {
+  date: string;
+  ags1: number | null;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  gamma_flip?: number | null;
+  cw1?: number | null;
+  pw1?: number | null;
+};
+
 const AGS1HisGammaChart = ({ lookback }: Props) => {
-  const [data, setData] = useState<any[]>([]);
+  const [rows, setRows] = useState<Row[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // ---- Filters / Toggles (mirrors CW1) -------------------------------------
   const [expirationType, setExpirationType] = useState<
     "Monthly" | "Quarterly" | "Both" | "None"
   >("Both");
+  const [showGammaFlip, setShowGammaFlip] = useState<boolean>(true);
+  const [showLargestCW, setShowLargestCW] = useState<boolean>(true);
+  const [showLargestPW, setShowLargestPW] = useState<boolean>(true);
+  // --------------------------------------------------------------------------
 
   const chartRef = useRef<any>(null);
   const chartSyncContext = useChartSync();
@@ -36,54 +54,22 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
         const response = await axios.get(
           `${apiBaseUrl}/data/ags1-history?lookback=${lookback}`
         );
-        const rawData = response.data;
-        console.log(rawData);
+        const raw = response.data;
 
-        type CandleDataPoint = {
-          date: string;
-          open: number;
-          high: number;
-          low: number;
-          close: number;
-          ags1?: number; // if you also include AGS1
-        };
-
-        const formattedData: CandleDataPoint[] = rawData.map((d: any) => ({
-          date: d.date,
-          ags1: d.ags1,
-          open: d["SPY OPEN"],
-          high: d["SPY HIGH"],
-          low: d["SPY LOW"],
-          close: d["SPY CLOSE"],
+        const formatted: Row[] = raw.map((d: any) => ({
+          date: d.date ?? d.Date,
+          ags1: d.ags1 ?? d.AGS1 ?? null,
+          open: Number(d["SPY OPEN"] ?? d.open),
+          high: Number(d["SPY HIGH"] ?? d.high),
+          low: Number(d["SPY LOW"] ?? d.low),
+          close: Number(d["SPY CLOSE"] ?? d.close),
+          // Include optional series so we can toggle them like CW1
+          gamma_flip: d.gamma_flip ?? d["Gamma Flip"] ?? null,
+          cw1: d.cw1 ?? d.CW1 ?? null,
+          pw1: d.pw1 ?? d.PW1 ?? null,
         }));
 
-        const traceAGS1 = {
-          type: "scatter",
-          x: formattedData.map((d) => d.date),
-          y: formattedData.map((d) => d.ags1),
-          name: "AGS1",
-          mode: "lines+markers",
-          line: {
-            color: "#212529",
-            width: 2,
-          },
-          hovertemplate: "Date: %{x}<br>AGS1: %{y:.0f}<extra></extra>",
-        };
-
-        const traceCandle = {
-          type: "candlestick",
-          x: formattedData.map((d) => d.date),
-          open: formattedData.map((d) => d.open),
-          high: formattedData.map((d) => d.high),
-          low: formattedData.map((d) => d.low),
-          close: formattedData.map((d) => d.close),
-          name: "SPY",
-          increasing: { line: { color: "#71c287" } },
-          decreasing: { line: { color: "#f08080" } },
-          hoverinfo: "skip",
-        };
-
-        setData([traceAGS1, traceCandle]);
+        setRows(formatted);
       } catch (err: any) {
         setError(`Failed to load AGS1 data: ${err.message}`);
       } finally {
@@ -92,10 +78,21 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
     };
 
     fetchData();
+
+    // Optional: refresh on tab return like CW1 (kept minimal here)
+    const onVis = () => {
+      if (document.visibilityState === "visible") {
+        // Re-fetch to stay fresh
+        // (Uncomment if you want the same behavior)
+        // fetchData();
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
   }, [lookback]);
 
+  // Draw vertical lines for expirations and hovered date
   const shapes: any[] = [];
-
   if (expirationType === "Monthly" || expirationType === "Both") {
     shapes.push(
       ...expirationLines.monthly.map((date) => ({
@@ -113,7 +110,6 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
       }))
     );
   }
-
   if (expirationType === "Quarterly" || expirationType === "Both") {
     shapes.push(
       ...expirationLines.quarterly.map((date) => ({
@@ -131,7 +127,6 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
       }))
     );
   }
-
   if (hoveredDate) {
     shapes.push({
       type: "line",
@@ -185,10 +180,76 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
     },
   };
 
+  // Build traces (AGS1 + optional overlays + candlestick)
+  const traces: any[] = [
+    {
+      type: "scatter",
+      x: rows.map((d) => d.date),
+      y: rows.map((d) => d.ags1),
+      name: "AGS1",
+      mode: "lines+markers",
+      line: { color: "#212529", width: 2 },
+      hovertemplate: "Date: %{x}<br>AGS1: %{y:.0f}<extra></extra>",
+    },
+    ...(showGammaFlip
+      ? [
+          {
+            type: "scatter" as const,
+            mode: "lines+markers" as const,
+            x: rows.map((d) => d.date),
+            y: rows.map((d) => d.gamma_flip),
+            name: "Gamma Flip",
+            line: { color: "#ffa500", width: 2, dash: "dot" as const },
+            hovertemplate: "Date: %{x}<br>Gamma Flip: %{y:.0f}<extra></extra>",
+          },
+        ]
+      : []),
+    ...(showLargestCW
+      ? [
+          {
+            type: "scatter" as const,
+            mode: "lines+markers" as const,
+            x: rows.map((d) => d.date),
+            y: rows.map((d) => d.cw1),
+            name: "Largest Call Wall",
+            line: { color: "#0096b4", width: 2, dash: "dot" as const },
+            hovertemplate:
+              "Date: %{x}<br>Largest Call Wall: %{y:.0f}<extra></extra>",
+          },
+        ]
+      : []),
+    ...(showLargestPW
+      ? [
+          {
+            type: "scatter" as const,
+            mode: "lines+markers" as const,
+            x: rows.map((d) => d.date),
+            y: rows.map((d) => d.pw1),
+            name: "Largest Put Wall",
+            line: { color: "#6f42c1", width: 2, dash: "dot" as const },
+            hovertemplate:
+              "Date: %{x}<br>Largest Put Wall: %{y:.0f}<extra></extra>",
+          },
+        ]
+      : []),
+    {
+      type: "candlestick",
+      x: rows.map((d) => d.date),
+      open: rows.map((d) => d.open),
+      high: rows.map((d) => d.high),
+      low: rows.map((d) => d.low),
+      close: rows.map((d) => d.close),
+      name: "SPY",
+      increasing: { line: { color: "#71c287" } },
+      decreasing: { line: { color: "#f08080" } },
+      hoverinfo: "skip",
+    },
+  ];
+
   useEffect(() => {
-    if (!hoveredDate || !data.length) return;
+    if (!hoveredDate || rows.length === 0) return;
     const el = chartRef.current?.el;
-    const index = data[0].x?.findIndex((d: any) => d === hoveredDate);
+    const index = rows.findIndex((d) => d.date === hoveredDate);
     if (el && index !== -1) {
       try {
         Plotly.Fx.hover(el, [{ curveNumber: 0, pointNumber: index }]);
@@ -196,9 +257,9 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
         console.error("Fx.hover failed in AGS1HisGammaChart", err);
       }
     }
-  }, [hoveredDate, data]);
+  }, [hoveredDate, rows]);
 
-  if (isLoading && data.length === 0) {
+  if (isLoading && rows.length === 0) {
     return (
       <div className="d-flex justify-content-center align-items-center p-5">
         <div className="spinner-border text-primary" role="status">
@@ -250,7 +311,8 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
         >
           LARGEST ABSOLUTE GAMMA WALL
         </h4>
-        <div className="d-flex justify-content-end me-2">
+        <div className="d-flex justify-content-end mb-2 me-2">
+          {/* Expiration filter (unchanged) */}
           <div
             className="btn-group btn-group-sm"
             role="group"
@@ -268,12 +330,84 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
               </button>
             ))}
           </div>
+
+          {/* Gamma Flip toggle */}
+          <div
+            className="btn-group btn-group-sm ms-2"
+            role="group"
+            aria-label="Gamma Flip Toggle"
+          >
+            <button
+              className={`btn btn-outline-secondary ${
+                showGammaFlip ? "active" : ""
+              }`}
+              onClick={() => setShowGammaFlip(true)}
+            >
+              Show Gamma Flip
+            </button>
+            <button
+              className={`btn btn-outline-secondary ${
+                !showGammaFlip ? "active" : ""
+              }`}
+              onClick={() => setShowGammaFlip(false)}
+            >
+              Hide Gamma Flip
+            </button>
+          </div>
+
+          {/* Largest Call Wall toggle */}
+          <div
+            className="btn-group btn-group-sm ms-2"
+            role="group"
+            aria-label="Largest Call Wall Toggle"
+          >
+            <button
+              className={`btn btn-outline-secondary ${
+                showLargestCW ? "active" : ""
+              }`}
+              onClick={() => setShowLargestCW(true)}
+            >
+              Show Largest CW
+            </button>
+            <button
+              className={`btn btn-outline-secondary ${
+                !showLargestCW ? "active" : ""
+              }`}
+              onClick={() => setShowLargestCW(false)}
+            >
+              Hide Largest CW
+            </button>
+          </div>
+
+          {/* Largest Put Wall toggle */}
+          <div
+            className="btn-group btn-group-sm ms-2"
+            role="group"
+            aria-label="Largest Put Wall Toggle"
+          >
+            <button
+              className={`btn btn-outline-secondary ${
+                showLargestPW ? "active" : ""
+              }`}
+              onClick={() => setShowLargestPW(true)}
+            >
+              Show Largest PW
+            </button>
+            <button
+              className={`btn btn-outline-secondary ${
+                !showLargestPW ? "active" : ""
+              }`}
+              onClick={() => setShowLargestPW(false)}
+            >
+              Hide Largest PW
+            </button>
+          </div>
         </div>
       </div>
 
       <Plot
         ref={chartRef}
-        data={data}
+        data={traces}
         layout={layout}
         useResizeHandler={true}
         style={{ width: "100%", height: "500px" }}
@@ -289,7 +423,7 @@ const AGS1HisGammaChart = ({ lookback }: Props) => {
         }}
         onHover={(event) => {
           if (event.points?.[0]) {
-            const hoveredX = String(event.points[0].x); // ✅ Safely convert to string
+            const hoveredX = String(event.points[0].x);
             setHoveredDate(hoveredX);
           }
         }}
