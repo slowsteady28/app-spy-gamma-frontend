@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Container, Row, Col, Card, Form } from "react-bootstrap";
 
 import AbsGamma2WallChart from "./AGS2HisGammaChart";
-import AbsGamma2NetOIChart from "./AGS2NetOIChart";
 import AGS2CallPutGammaChart from "./AGS2CallPutGammaChart";
 import AbsGamma2DurationChart from "./AGS2DurationChart";
 
@@ -75,9 +74,6 @@ const AbsGamma2AppReady = () => {
                 >
                   <Col xs={12} style={{ padding: 0 }}>
                     <AbsGamma2WallChart lookback={lookback} />
-                  </Col>
-                  <Col xs={12} style={{ padding: 0 }}>
-                    <AbsGamma2NetOIChart lookback={lookback} />
                   </Col>
                   <Col xs={12} style={{ padding: 0 }}>
                     <AGS2CallPutGammaChart lookback={lookback} />

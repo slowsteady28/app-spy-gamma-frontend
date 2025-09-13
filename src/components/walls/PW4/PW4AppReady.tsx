@@ -3,7 +3,6 @@ import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { ChartSyncProvider } from "../../../context/ChartSyncContext";
 
 import PW4WallChart from "./PW4WallChart";
-import PW4NetOIChart from "./PW4NetOIChart";
 import PW4NetGammaChart from "./PW4NetGammaChart";
 import PW4DurationChart from "./PW4DurationChart";
 import SPYHourlyChart from "../../charts/PW4SPYHourlyChart";
@@ -129,24 +128,6 @@ const PW4AppReady = () => {
                       style={{ background: "transparent", padding: 0 }}
                     >
                       <PW4WallChart
-                        lookback={lookback}
-                        selectedRange={null}
-                        setSelectedRange={() => {}}
-                        activeIndex={null}
-                        setActiveIndex={() => {}}
-                      />
-                    </Col>
-                  </Row>
-
-                  <Row
-                    className="g-0"
-                    style={{ background: "transparent", margin: 0 }}
-                  >
-                    <Col
-                      xs={12}
-                      style={{ background: "transparent", padding: 0 }}
-                    >
-                      <PW4NetOIChart
                         lookback={lookback}
                         selectedRange={null}
                         setSelectedRange={() => {}}

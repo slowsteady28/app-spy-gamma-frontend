@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { ChartSyncProvider } from "../../../context/ChartSyncContext";
 
 import PW1WallChart from "./PW1WallChart";
-import PW1NetOIChart from "./PW1NetOIChart";
+
 import PW1NetGammaChart from "./PW1NetGammaChart";
 import PW1DurationChart from "./PW1DurationChart";
 import ChartSkeleton from "../utils/ChartSkeleton";
@@ -128,24 +128,6 @@ const PW1AppReady = () => {
                       style={{ background: "transparent", padding: 0 }}
                     >
                       <PW1WallChart
-                        lookback={lookback}
-                        selectedRange={null}
-                        setSelectedRange={() => {}}
-                        activeIndex={null}
-                        setActiveIndex={() => {}}
-                      />
-                    </Col>
-                  </Row>
-
-                  <Row
-                    className="g-0"
-                    style={{ background: "transparent", margin: 0 }}
-                  >
-                    <Col
-                      xs={12}
-                      style={{ background: "transparent", padding: 0 }}
-                    >
-                      <PW1NetOIChart
                         lookback={lookback}
                         selectedRange={null}
                         setSelectedRange={() => {}}

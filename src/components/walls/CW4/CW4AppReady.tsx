@@ -3,7 +3,6 @@ import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { ChartSyncProvider } from "../../../context/ChartSyncContext";
 
 import CW4WallChart from "./CW4WallChart";
-import CW4NetOIChart from "./CW4NetOIChart";
 import CW4NetGammaChart from "./CW4NetGammaChart";
 import CW4DurationChart from "./CW4DurationChart";
 import ChartSkeleton from "../utils/ChartSkeleton";
@@ -128,24 +127,6 @@ const CW4AppReady = () => {
                       style={{ background: "transparent", padding: 0 }}
                     >
                       <CW4WallChart
-                        lookback={lookback}
-                        selectedRange={null}
-                        setSelectedRange={() => {}}
-                        activeIndex={null}
-                        setActiveIndex={() => {}}
-                      />
-                    </Col>
-                  </Row>
-
-                  <Row
-                    className="g-0"
-                    style={{ background: "transparent", margin: 0 }}
-                  >
-                    <Col
-                      xs={12}
-                      style={{ background: "transparent", padding: 0 }}
-                    >
-                      <CW4NetOIChart
                         lookback={lookback}
                         selectedRange={null}
                         setSelectedRange={() => {}}
