@@ -111,15 +111,7 @@ const PutWallsTopFive = () => {
                         setActiveIndex={() => {}}
                       />
                     </Col>
-                    <Col xs={12}>
-                      <NetOIChart
-                        lookback={lookback}
-                        selectedRange={null}
-                        setSelectedRange={() => {}}
-                        activeIndex={null}
-                        setActiveIndex={() => {}}
-                      />
-                    </Col>
+
                     <Col xs={12}>
                       <NetGammaChart lookback={lookback} />
                     </Col>

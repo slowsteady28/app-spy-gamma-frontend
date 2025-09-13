@@ -15,7 +15,6 @@ import CW3NetGammaChart from "./CW3/CW3NetGammaChart";
 import CW3DurationChart from "./CW3/CW3DurationChart";
 
 import CW4WallChart from "./CW4/CW4WallChart";
-import CW4NetOIChart from "./CW4/CW4NetOIChart";
 import CW4NetGammaChart from "./CW4/CW4NetGammaChart";
 import CW4DurationChart from "./CW4/CW4DurationChart";
 
