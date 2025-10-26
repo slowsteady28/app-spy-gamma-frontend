@@ -109,7 +109,7 @@ function Dashboard() {
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <MarketCommentary />
+                    <CW1AppReady />
                   </ProtectedRoute>
                 }
               />
